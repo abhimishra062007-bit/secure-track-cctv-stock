@@ -1,1 +1,260 @@
 
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Secure Track Security | CCTV Stock</title>
+<style>
+:root{--bg:#0b1220;--panel:#131e30;--line:#29374c;--text:#eaf1fb;--muted:#91a2bb;--blue:#3b82f6;--green:#22c55e;--red:#ef4444}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:15px Arial,sans-serif}
+header{padding:20px 16px;background:#101b2c;border-bottom:1px solid var(--line)}
+header h2{margin:0 0 7px;font-size:21px}
+header p{margin:0;color:var(--muted);font-size:13px}
+main{max-width:1100px;margin:auto;padding:15px}
+nav{display:flex;gap:8px;overflow:auto;padding:12px 0}
+button,.tab{border:0;border-radius:8px;padding:11px 13px;background:#26364d;color:white;cursor:pointer;font-weight:600}
+button.primary{background:var(--blue)}
+button.green{background:#168348}
+button.red{background:#a92e39}
+nav button.active{background:var(--blue)}
+.page{display:none}.page.active{display:block}
+.cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:10px 0 16px}
+.card,.panel{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:15px;margin-bottom:14px}
+.card small,.muted{color:var(--muted)}
+.card strong{display:block;font-size:24px;margin-top:10px;overflow-wrap:anywhere}
+h3{margin:0 0 14px;font-size:17px}
+label{display:block;font-size:13px;color:#b8c6d9;margin:11px 0 6px}
+input,select{width:100%;padding:12px;background:#0b1525;border:1px solid #34445b;border-radius:8px;color:white;font-size:15px}
+.formgrid{display:grid;grid-template-columns:1fr;gap:4px}
+.actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.tablewrap{overflow:auto}
+table{width:100%;border-collapse:collapse;min-width:520px;font-size:13px}
+th,td{text-align:left;padding:11px 9px;border-bottom:1px solid var(--line)}
+th{color:#9eb1cb}
+.good{color:#4ade80}.bad{color:#f87171}
+#chart{width:100%;height:170px;display:block}
+.notice{font-size:12px;line-height:1.6;color:var(--muted)}
+@media(min-width:650px){.cards{grid-template-columns:repeat(4,minmax(0,1fr))}.formgrid{grid-template-columns:1fr 1fr}.formgrid .full{grid-column:1/-1}}
+</style>
+</head>
+<body>
+<header>
+  <h2>🛡️ SECURE TRACK SECURITY</h2>
+  <p>CCTV STOCK MANAGEMENT TERMINAL · INDORE</p>
+</header>
+<main>
+<nav>
+  <button class="active" data-page="dashboard">Dashboard</button>
+  <button data-page="stock">Stock Entry</button>
+  <button data-page="sale">Sale</button>
+  <button data-page="inventory">Inventory</button>
+  <button data-page="history">History</button>
+  <button data-page="backup">Backup</button>
+</nav>
+
+<section id="dashboard" class="page active">
+  <div class="cards">
+    <div class="card"><small>Total In-Stock Cameras</small><strong id="kStock">0</strong></div>
+    <div class="card"><small>Models</small><strong id="kModels">0</strong></div>
+    <div class="card"><small>Total Sales</small><strong id="kSales">₹0</strong></div>
+    <div class="card"><small>Gross Profit</small><strong id="kProfit" class="good">₹0</strong></div>
+  </div>
+  <div class="panel">
+    <h3>Recent 7-Day Sales</h3>
+    <svg id="chart" viewBox="0 0 600 170" preserveAspectRatio="none"></svg>
+    <p class="notice">चार्ट आपकी दर्ज की गई बिक्री पर आधारित है।</p>
+  </div>
+  <div class="panel">
+    <h3>Quick Actions</h3>
+    <div class="actions">
+      <button class="primary" onclick="showPage('stock')">+ Add Camera Stock</button>
+      <button class="green" onclick="showPage('sale')">Record Sale</button>
+      <button onclick="showPage('backup')">Backup Data</button>
+    </div>
+  </div>
+</section>
+
+<section id="stock" class="page">
+  <div class="panel">
+    <h3>Purchase / Camera Stock Entry</h3>
+    <form id="stockForm">
+      <div class="formgrid">
+        <div><label>Brand</label><input id="brand" value="CP Plus" required></div>
+        <div><label>Camera Model</label><input id="model" placeholder="जैसे CP-UNC-..." required></div>
+        <div class="full"><label>Unique Serial Number / Barcode</label><input id="serial" placeholder="Barcode scan करें या serial लिखें" required autocomplete="off"></div>
+        <div><label>Purchase Cost (₹)</label><input id="cost" type="number" min="0" step=".01" required></div>
+        <div><label>Expected Sale Price (₹)</label><input id="price" type="number" min="0" step=".01" required></div>
+      </div>
+      <div class="actions"><button class="primary" type="submit">Save Camera</button></div>
+    </form>
+    <p class="notice">एक कैमरा = एक unique serial number। USB barcode scanner को input में क्लिक करके scan करें। अगर scanner Enter भेजता है, तो फॉर्म सबमिट हो सकता है।</p>
+  </div>
+</section>
+
+<section id="sale" class="page">
+  <div class="panel">
+    <h3>Sell / Dispatch Camera</h3>
+    <form id="saleForm">
+      <label>Camera Serial Number / Barcode</label>
+      <input id="saleSerial" placeholder="Serial scan करें" required autocomplete="off">
+      <label>Customer Name (optional)</label>
+      <input id="customer" placeholder="Customer name">
+      <label>Actual Sale Price (₹)</label>
+      <input id="salePrice" type="number" min="0" step=".01" required>
+      <div class="actions"><button class="green" type="submit">Confirm Sale</button></div>
+    </form>
+    <p class="notice">बिक्री के बाद कैमरा स्टॉक से हटेगा और gross profit रिकॉर्ड होगा।</p>
+  </div>
+</section>
+
+<section id="inventory" class="page">
+  <div class="panel">
+    <h3>Camera Inventory</h3>
+    <input id="filter" placeholder="Model, brand या serial से खोजें">
+    <div class="tablewrap"><table><thead><tr><th>Brand / Model</th><th>Serial</th><th>Cost</th><th>Sale Price</th><th>Status</th></tr></thead><tbody id="stockRows"></tbody></table></div>
+  </div>
+  <div class="panel">
+    <h3>Model-wise Stock Summary</h3>
+    <div class="tablewrap"><table><thead><tr><th>Brand / Model</th><th>In Stock</th><th>Sold</th></tr></thead><tbody id="modelRows"></tbody></table></div>
+  </div>
+</section>
+
+<section id="history" class="page">
+  <div class="panel">
+    <h3>Purchase & Sales History</h3>
+    <div class="tablewrap"><table><thead><tr><th>Date</th><th>Type</th><th>Model / Serial</th><th>Amount</th><th>Profit</th></tr></thead><tbody id="historyRows"></tbody></table></div>
+  </div>
+</section>
+
+<section id="backup" class="page">
+  <div class="panel">
+    <h3>Backup & Recovery</h3>
+    <p class="notice">Backup file को मोबाइल से अलग सुरक्षित जगह पर रखें। दूसरे मोबाइल/कंप्यूटर पर डेटा ले जाने के लिए JSON backup इस्तेमाल करें।</p>
+    <div class="actions">
+      <button class="primary" onclick="exportBackup()">Download Backup</button>
+      <button onclick="document.getElementById('restoreFile').click()">Restore Backup</button>
+      <button onclick="exportCSV()">Export Inventory CSV</button>
+      <input id="restoreFile" type="file" accept=".json,application/json" hidden>
+    </div>
+    <p class="notice">महत्वपूर्ण: GitHub Pages पर यह शुरुआती वर्जन डेटा इसी ब्राउज़र के local storage में रखता है। यह अपने-आप cloud sync नहीं करता। ब्राउज़र का data clear करने से पहले backup जरूर लें।</p>
+    <p id="backupStatus" class="notice"></p>
+  </div>
+</section>
+</main>
+<script>
+const KEY="secure_track_cctv_stock_v1";
+let db={cameras:[],transactions:[]};
+
+function loadDB(){
+  try{
+    const saved=localStorage.getItem(KEY);
+    if(saved){const d=JSON.parse(saved);if(d&&Array.isArray(d.cameras)&&Array.isArray(d.transactions))db=d;}
+  }catch(e){alert("Saved data पढ़ने में समस्या हुई। Backup file हो तो Restore करें।");}
+}
+function saveDB(){localStorage.setItem(KEY,JSON.stringify(db));render();}
+function money(n){return "₹"+Number(n||0).toLocaleString("en-IN",{maximumFractionDigits:2});}
+function dateText(d){return new Date(d).toLocaleString("en-IN");}
+function showPage(id){
+  document.querySelectorAll(".page").forEach(x=>x.classList.toggle("active",x.id===id));
+  document.querySelectorAll("nav button").forEach(x=>x.classList.toggle("active",x.dataset.page===id));
+  if(id==="stock")setTimeout(()=>document.getElementById("serial").focus(),80);
+  if(id==="sale")setTimeout(()=>document.getElementById("saleSerial").focus(),80);
+  render();
+}
+document.querySelectorAll("nav button").forEach(b=>b.addEventListener("click",()=>showPage(b.dataset.page)));
+
+document.getElementById("stockForm").addEventListener("submit",e=>{
+  e.preventDefault();
+  const serial=document.getElementById("serial").value.trim();
+  if(db.cameras.some(c=>c.serial.toLowerCase()===serial.toLowerCase()))return alert("यह Serial Number पहले से मौजूद है!");
+  const c={
+    id:crypto.randomUUID?crypto.randomUUID():String(Date.now()),
+    brand:document.getElementById("brand").value.trim(),
+    model:document.getElementById("model").value.trim(),
+    serial,cost:Number(document.getElementById("cost").value),
+    price:Number(document.getElementById("price").value),
+    status:"In Stock",customer:"",added:new Date().toISOString(),soldAt:"",salePrice:0
+  };
+  db.cameras.push(c);
+  db.transactions.push({date:c.added,type:"Purchase",model:c.brand+" "+c.model,serial:c.serial,amount:c.cost,profit:0});
+  saveDB();e.target.reset();document.getElementById("brand").value="CP Plus";
+  alert("Camera stock save हो गया।");
+});
+
+document.getElementById("saleForm").addEventListener("submit",e=>{
+  e.preventDefault();
+  const serial=document.getElementById("saleSerial").value.trim();
+  const c=db.cameras.find(x=>x.serial.toLowerCase()===serial.toLowerCase());
+  if(!c)return alert("Serial Number नहीं मिला। पहले stock entry करें।");
+  if(c.status!=="In Stock")return alert("यह कैमरा पहले ही sold हो चुका है।");
+  const amount=Number(document.getElementById("salePrice").value);
+  if(amount<0)return alert("Sale price गलत है।");
+  c.status="Sold";c.customer=document.getElementById("customer").value.trim();
+  c.salePrice=amount;c.soldAt=new Date().toISOString();
+  db.transactions.push({date:c.soldAt,type:"Sale",model:c.brand+" "+c.model,serial:c.serial,amount,profit:amount-c.cost});
+  saveDB();e.target.reset();alert("Sale save हो गई।");
+});
+
+document.getElementById("filter").addEventListener("input",render);
+function render(){
+  const inStock=db.cameras.filter(c=>c.status==="In Stock");
+  const sold=db.cameras.filter(c=>c.status==="Sold");
+  const sales=sold.reduce((s,c)=>s+c.salePrice,0);
+  const profit=sold.reduce((s,c)=>s+c.salePrice-c.cost,0);
+  document.getElementById("kStock").textContent=inStock.length;
+  document.getElementById("kModels").textContent=new Set(db.cameras.map(c=>c.brand+" "+c.model)).size;
+  document.getElementById("kSales").textContent=money(sales);
+  document.getElementById("kProfit").textContent=money(profit);
+
+  const q=(document.getElementById("filter")?.value||"").toLowerCase();
+  document.getElementById("stockRows").innerHTML=db.cameras.filter(c=>(c.brand+" "+c.model+" "+c.serial).toLowerCase().includes(q)).slice().reverse().map(c=>
+    `<tr><td>${esc(c.brand)}<br>${esc(c.model)}</td><td>${esc(c.serial)}</td><td>${money(c.cost)}</td><td>${money(c.salePrice||c.price)}</td><td class="${c.status==="Sold"?"bad":"good"}">${c.status}</td></tr>`
+  ).join("")||'<tr><td colspan="5">अभी कोई कैमरा दर्ज नहीं है।</td></tr>';
+
+  const groups={};
+  db.cameras.forEach(c=>{const k=c.brand+" "+c.model;groups[k]??={stock:0,sold:0};groups[k][c.status==="Sold"?"sold":"stock"]++;});
+  document.getElementById("modelRows").innerHTML=Object.entries(groups).map(([k,v])=>`<tr><td>${esc(k)}</td><td>${v.stock}</td><td>${v.sold}</td></tr>`).join("")||'<tr><td colspan="3">अभी डेटा नहीं है।</td></tr>';
+
+  document.getElementById("historyRows").innerHTML=db.transactions.slice().reverse().map(t=>
+    `<tr><td>${dateText(t.date)}</td><td>${esc(t.type)}</td><td>${esc(t.model)}<br><span class="muted">${esc(t.serial)}</span></td><td>${money(t.amount)}</td><td class="${t.profit<0?"bad":"good"}">${money(t.profit)}</td></tr>`
+  ).join("")||'<tr><td colspan="5">अभी कोई transaction नहीं है।</td></tr>';
+  drawChart();
+}
+function esc(s){return String(s??"").replace(/[&<>"']/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch]));}
+function drawChart(){
+  const svg=document.getElementById("chart"),now=new Date(),days=[];
+  for(let i=6;i>=0;i--){const d=new Date(now);d.setDate(d.getDate()-i);days.push(d);}
+  const vals=days.map(d=>db.transactions.filter(t=>t.type==="Sale"&&new Date(t.date).toDateString()===d.toDateString()).reduce((s,t)=>s+t.amount,0));
+  const max=Math.max(1,...vals),pts=vals.map((v,i)=>`${35+i*88},${140-v/max*110}`).join(" ");
+  svg.innerHTML=`<line x1="25" y1="140" x2="590" y2="140" stroke="#34445b"/><line x1="25" y1="85" x2="590" y2="85" stroke="#29374c"/><line x1="25" y1="30" x2="590" y2="30" stroke="#29374c"/><polyline points="${pts}" fill="none" stroke="#3b82f6" stroke-width="3" stroke-linejoin="round"/>`+
+  vals.map((v,i)=>`<circle cx="${35+i*88}" cy="${140-v/max*110}" r="4" fill="#22c55e"><title>${money(v)}</title></circle><text x="${35+i*88}" y="162" text-anchor="middle" fill="#91a2bb" font-size="10">${days[i].getDate()}/${days[i].getMonth()+1}</text>`).join("");
+}
+function exportBackup(){
+  const blob=new Blob([JSON.stringify(db,null,2)],{type:"application/json"});
+  downloadBlob(blob,"SecureTrackSecurity_Backup_"+new Date().toISOString().slice(0,10)+".json");
+  document.getElementById("backupStatus").textContent="Backup download शुरू किया गया। Downloads folder जाँचें।";
+}
+function exportCSV(){
+  const rows=[["Brand","Model","Serial","Cost","Expected Price","Status","Sale Price","Customer"],...db.cameras.map(c=>[c.brand,c.model,c.serial,c.cost,c.price,c.status,c.salePrice,c.customer])];
+  const csv=rows.map(r=>r.map(v=>'"'+String(v??"").replace(/"/g,'""')+'"').join(",")).join("\r\n");
+  downloadBlob(new Blob(["\uFEFF"+csv],{type:"text/csv;charset=utf-8"}),"SecureTrackSecurity_Inventory.csv");
+}
+function downloadBlob(blob,name){
+  const url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
+}
+document.getElementById("restoreFile").addEventListener("change",async e=>{
+  const f=e.target.files[0];if(!f)return;
+  try{
+    const d=JSON.parse(await f.text());
+    if(!Array.isArray(d.cameras)||!Array.isArray(d.transactions))throw Error("Invalid backup");
+    if(!confirm("मौजूदा डेटा replace करके backup restore करें? पहले वर्तमान backup ले लें।"))return;
+    db=d;saveDB();alert("Backup restore हो गया।");
+  }catch(err){alert("Backup file सही नहीं है।");}
+  e.target.value="";
+});
+loadDB();render();
+</script>
+</body>
+</html>
