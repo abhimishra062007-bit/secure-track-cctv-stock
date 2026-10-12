@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Secure Track Security | CCTV Manager</title>
+<style>
+:root{--bg:#f3f6fb;--panel:#fff;--ink:#172033;--muted:#69758a;--line:#e3e9f2;--blue:#2459d3;--green:#149568;--red:#d94343;--orange:#e99a21}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:14px Arial,sans-serif}
+button,input,select,textarea{font:inherit}
+button{cursor:pointer}
+header{height:64px;background:#111d35;color:white;display:flex;align-items:center;gap:12px;padding:0 16px;position:sticky;top:0;z-index:10}
+.brand{font-size:16px;font-weight:800;flex:1}
+.brand small{display:block;font-size:11px;color:#bac7df;margin-top:4px}
+.iconbtn{background:#263754;color:white;border:0;border-radius:10px;padding:10px 13px;font-size:18px}
+.wrap{max-width:1200px;margin:auto;padding:16px}
+.page{display:none}.page.active{display:block}
+h2{font-size:21px;margin:4px 0 6px}
+.sub{color:var(--muted);margin:0 0 18px;line-height:1.5}
+.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:15px;padding:16px;margin-bottom:12px;min-width:0}
+.stat-label{color:var(--muted);font-size:12px}
+.stat-value{font-size:22px;font-weight:800;margin-top:9px;overflow-wrap:anywhere}
+.stat-note{font-size:11px;color:var(--muted);margin-top:7px}
+.section-title{font-size:15px;font-weight:800;margin:0 0 13px}
+.formgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.field{display:flex;flex-direction:column;gap:6px;min-width:0}
+.field.full{grid-column:1/-1}
+label{font-size:12px;color:var(--muted);font-weight:700}
+input,select,textarea{width:100%;padding:11px;border:1px solid #d8e0ec;border-radius:9px;background:white;color:#172033;min-width:0}
+textarea{min-height:75px;resize:vertical}
+.btn{border:0;border-radius:9px;padding:11px 14px;background:var(--blue);color:white;font-weight:700}
+.btn.secondary{background:#e9eef8;color:#24334e}
+.btn.danger{background:#fff0f0;color:#b92727}
+.btn.green{background:var(--green)}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+.tablewrap{overflow:auto}
+table{border-collapse:collapse;width:100%;min-width:540px}
+th,td{text-align:left;border-bottom:1px solid var(--line);padding:11px 9px;font-size:12px;vertical-align:top}
+th{color:var(--muted);background:#f8faff}
+.empty{padding:20px;color:var(--muted);text-align:center}
+.notice{background:#eaf1ff;border:1px solid #d5e2ff;color:#234c9d;border-radius:11px;padding:12px;margin-bottom:14px;line-height:1.5}
+.pill{display:inline-block;padding:5px 8px;border-radius:20px;background:#e7f7ef;color:#08784f;font-size:11px;font-weight:700}
+.pill.red{background:#fff0f0;color:#bd2e2e}
+.muted{color:var(--muted)}
+/* Sidebar */
+.overlay{display:none;position:fixed;inset:0;background:#08152c88;z-index:19}
+.sidebar{position:fixed;z-index:20;top:0;bottom:0;left:0;width:285px;background:#111d35;color:white;padding:18px;overflow:auto;transform:translateX(-105%);transition:transform .22s}
+.sidebar.open{transform:translateX(0)}
+.overlay.show{display:block}
+.sidehead{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
+.sidehead strong{font-size:16px}
+.sidehead button{border:0;background:#263754;color:white;padding:8px 11px;border-radius:8px}
+.menu-label{color:#93a7c7;font-size:10px;font-weight:bold;letter-spacing:1px;margin:18px 8px 8px}
+.menu{width:100%;border:0;background:transparent;color:#e3eaf7;text-align:left;padding:12px;border-radius:9px;margin:2px 0;display:flex;gap:10px;align-items:center}
+.menu:hover,.menu.active{background:#294b85;color:white}
+.menu span{width:22px;text-align:center}
+.sidebar-foot{font-size:11px;color:#a9b9d3;line-height:1.6;margin:20px 8px}
+.gauge{width:120px;height:120px;border-radius:50%;margin:12px auto 0;background:conic-gradient(var(--green) 0deg 220deg,#e7edf6 220deg 360deg);display:grid;place-items:center;position:relative}
+.gauge:before{content:"";position:absolute;inset:10px;border-radius:50%;background:white}
+.gaugeinner{position:relative;text-align:center}
+.gaugeinner b{font-size:20px;display:block}
+.gaugeinner small{font-size:10px;color:var(--muted)}
+@media(max-width:800px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.wrap{padding:12px}.stat-value{font-size:19px}}
+@media(max-width:430px){.formgrid{grid-template-columns:1fr}.field.full{grid-column:auto}.brand{font-size:14px}.card{padding:13px}}
+</style>
+</head>
+<body>
+<header>
+<button class="iconbtn" id="openMenu" aria-label="Open menu">☰</button>
+<div class="brand">SECURE TRACK SECURITY<small>CCTV STOCK & BUSINESS MANAGER</small></div>
+<button class="iconbtn" id="headerBackup" title="Backup">⬇</button>
+</header>
+
+<div class="overlay" id="overlay"></div>
+<aside class="sidebar" id="sidebar">
+  <div class="sidehead"><strong>☷ Secure Track</strong><button id="closeMenu">✕</button></div>
+  <div class="menu-label">BUSINESS</div>
+  <button class="menu active" data-page="dashboard"><span>▦</span> Dashboard</button>
+  <button class="menu" data-page="stock"><span>▣</span> Stock / Products</button>
+  <button class="menu" data-page="purchase"><span>＋</span> Purchases</button>
+  <button class="menu" data-page="sales"><span>₹</span> Sales</button>
+  <button class="menu" data-page="customers"><span>♙</span> Customers / Sites</button>
+  <button class="menu" data-page="install"><span>⌂</span> Installation Jobs</button>
+  <button class="menu" data-page="payments"><span>⇄</span> Customer Payments</button>
+  <button class="menu" data-page="expenses"><span>−</span> Expenses</button>
+  <button class="menu" data-page="reports"><span>▤</span> Reports</button>
+  <button class="menu" data-page="quotations"><span>▧</span> Quotations</button>
+  <button class="menu" data-page="paymentSettings"><span>⚙</span> Payment Settings</button>
+  <div class="menu-label">DATA & BACKUP</div>
+  <button class="menu" data-page="backup"><span>☁</span> Backup / Restore</button>
+  <div class="sidebar-foot">Your data is saved in this browser. Download a backup before changing your phone or browser.</div>
+</aside>
+
+<main class="wrap">
+<section class="page active" id="dashboard">
+  <h2>Business Dashboard</h2>
+  <p class="sub">A quick overview of your CCTV business.</p>
+  <div class="grid">
+    <div class="card"><div class="stat-label">Total Stock Products</div><div class="stat-value" id="dProducts">0</div><div class="stat-note">Unique Products</div></div>
+    <div class="card"><div class="stat-label">Estimated Stock Value</div><div class="stat-value" id="dStockValue">₹0</div><div class="stat-note">Current Quantity × Purchase Price</div></div>
+    <div class="card"><div class="stat-label">Total Sales</div><div class="stat-value" id="dSales">₹0</div><div class="stat-note">All recorded sales</div></div>
+    <div class="card"><div class="stat-label">Customer Outstanding</div><div class="stat-value" id="dDue">₹0</div><div class="stat-note">From sales/opening balances</div></div>
+  </div>
+  <div class="grid">
+    <div class="card"><div class="stat-label">Customers / Sites</div><div class="stat-value" id="dCustomers">0</div></div>
+    <div class="card"><div class="stat-label">Low Stock Products</div><div class="stat-value" id="dLow">0</div></div>
+    <div class="card"><div class="stat-label">Total Installation Jobs</div><div class="stat-value" id="dInstalls">0</div></div>
+    <div class="card"><div class="stat-label">Recorded Expenses</div><div class="stat-value" id="dExpenses">₹0</div></div>
+  </div>
+  <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(230px,1fr))">
+    <div class="card"><div class="section-title">Sales Collection Indicator</div><div class="gauge"><div class="gaugeinner"><b id="gaugePct">0%</b><small>Sales Collected</small></div></div><p class="muted" style="text-align:center;font-size:12px" id="gaugeText">The indicator updates when sales are recorded.</p></div>
+    <div class="card"><div class="section-title">Low Stock Alerts</div><div id="lowStock" class="muted">No information yet.</div></div>
+  </div>
+  <div class="card"><div class="section-title">Recent Activity</div><div id="recent" class="muted">No entries yet.</div></div>
+</section>
+
+<section class="page" id="stock">
+  <h2>Stock / Products</h2><p class="sub">Manage CCTV cameras, DVRs/NVRs, hard drives, cables, and other inventory.</p>
+  <div class="card"><div class="section-title">Add / Update Product</div>
+    <form id="productForm"><input type="hidden" id="pId">
+      <div class="formgrid">
+        <div class="field"><label>Product Name *</label><input id="pName" required placeholder="CP Plus 2MP Camera"></div>
+        <div class="field"><label>Model Name / SKU</label><input id="pSku" placeholder="Model number"></div>
+        <div class="field"><label>Category</label><input id="pCategory" placeholder="Camera / DVR / Cable"></div>
+        <div class="field"><label>Quantity *</label><input id="pQty" type="number" min="0" step="1" required value="0"></div>
+        <div class="field"><label>Purchase Price (per unit)</label><input id="pCost" type="number" min="0" step=".01" value="0"></div>
+        <div class="field"><label>Selling Price (per unit)</label><input id="pPrice" type="number" min="0" step=".01" value="0"></div>
+        <div class="field"><label>Low Stock Threshold</label><input id="pMin" type="number" min="0" value="2"></div>
+        <div class="field"><label>Note</label><input id="pNote" placeholder="Warranty / supplier etc."></div>
+      </div><div class="actions"><button class="btn" type="submit">Save Product</button><button class="btn secondary" type="reset" id="pReset">Clear Form</button></div>
+    </form>
+  </div>
+  <div class="card"><div class="section-title">Serial Number Scanner</div>
+    <p class="muted">Select an existing product/model, scan each unique serial number, then confirm to add exactly the scanned quantity to stock. Duplicate serial numbers are rejected.</p>
+    <div class="formgrid">
+      <div class="field"><label>Product / Model *</label><select id="scanProduct"></select></div>
+      <div class="field"><label>Scan or Enter Serial Number</label><input id="scanSerial" autocomplete="off" placeholder="Scan barcode or type serial number"></div>
+    </div>
+    <div class="actions"><button class="btn" id="addSerial" type="button">Add Serial</button><button class="btn secondary" id="clearScans" type="button">Clear Pending Scans</button></div>
+    <p><b>Unique serials scanned: <span id="scanCount">0</span></b></p>
+    <div class="tablewrap"><table><thead><tr><th>Serial Number</th><th>Scan Date & Time</th><th>Action</th></tr></thead><tbody id="scanList"><tr><td class="empty" colspan="3">No serials scanned yet.</td></tr></tbody></table></div>
+    <div class="actions"><button class="btn green" id="confirmScans" type="button">Confirm Stock</button></div>
+  </div>
+  <div class="card"><div class="section-title">Current Stock</div><input id="stockSearch" placeholder="Search products..." style="margin-bottom:12px"><div class="tablewrap"><table><thead><tr><th>Product</th><th>Quantity</th><th>Cost</th><th>Selling Price</th><th>Actions</th></tr></thead><tbody id="stockList"></tbody></table></div></div>
+</section>
+
+<section class="page" id="purchase">
+  <h2>Purchases</h2><p class="sub">Record supplier purchases and increase stock.</p>
+  <div class="card"><form id="purchaseForm"><div class="formgrid">
+    <div class="field"><label>Product *</label><select id="buyProduct" required></select></div>
+    <div class="field"><label>Quantity *</label><input id="buyQty" type="number" min="1" required value="1"></div>
+    <div class="field"><label>Purchase Price per Unit *</label><input id="buyCost" type="number" min="0" step=".01" required value="0"></div>
+    <div class="field"><label>Supplier</label><input id="buySupplier" placeholder="Supplier name"></div>
+    <div class="field"><label>Date</label><input id="buyDate" type="date"></div>
+    <div class="field"><label>Bill / Note</label><input id="buyNote"></div>
+  </div><div class="actions"><button class="btn" type="submit">Save Purchase</button></div></form></div>
+  <div class="card"><div class="section-title">Purchase History</div><div class="tablewrap"><table><thead><tr><th>Date</th><th>Product</th><th>Quantity</th><th>Total</th><th>Supplier</th></tr></thead><tbody id="purchaseList"></tbody></table></div></div>
+</section>
+
+<section class="page" id="sales">
+  <h2>Sales</h2><p class="sub">Stock decreases automatically when items are sold. Customer outstanding amounts are recorded too.</p>
+  <div class="card"><form id="saleForm"><div class="formgrid">
+    <div class="field"><label>Product *</label><select id="saleProduct" required></select></div>
+    <div class="field"><label>Customers / Sites</label><select id="saleCustomer"></select></div>
+    <div class="field"><label>Quantity *</label><input id="saleQty" type="number" min="1" required value="1"></div>
+    <div class="field"><label>Selling Price per Unit *</label><input id="salePrice" type="number" min="0" step=".01" required value="0"></div>
+    <div class="field"><label>Amount Paid</label><input id="salePaid" type="number" min="0" step=".01" value="0"></div>
+    <div class="field"><label>Date</label><input id="saleDate" type="date"></div>
+    <div class="field full"><label>Note / Bill Number</label><input id="saleNote"></div>
+  </div><div class="actions"><button class="btn" type="submit">Save Sale</button></div></form></div>
+  <div class="card"><div class="section-title">Sales History</div><div class="tablewrap"><table><thead><tr><th>Date</th><th>Product</th><th>Customer</th><th>Total</th><th>Paid</th><th>Due</th></tr></thead><tbody id="salesList"></tbody></table></div></div>
+</section>
+<section class="page" id="customers">
+  <h2>Customers / Sites</h2><p class="sub">Save customer details, site information, quotations, payments, and outstanding balances here.</p>
+  <div class="card"><div class="section-title">Add / Update Customer</div>
+    <form id="customerForm"><input type="hidden" id="cId">
+      <div class="formgrid">
+        <div class="field"><label>Customer / Site Name *</label><input id="cName" required></div>
+        <div class="field"><label>Mobile Number *</label><input id="cPhone" required inputmode="tel"></div>
+        <div class="field"><label>Alternate Mobile</label><input id="cAltPhone" inputmode="tel"></div>
+        <div class="field"><label>Full Site Address</label><textarea id="cAddress"></textarea></div>
+        <div class="field"><label>Quotation Amount ₹</label><input id="cQuote" type="number" min="0" step=".01" value="0"></div>
+        <div class="field"><label>Opening Due ₹</label><input id="cOpening" type="number" min="0" step=".01" value="0"></div>
+        <div class="field"><label>Amount Received ₹</label><input id="cReceived" type="number" min="0" step=".01" value="0"></div>
+        <div class="field"><label>Installation Date</label><input id="cInstallDate" type="date"></div>
+        <div class="field full"><label>Camera / Equipment Details</label><textarea id="cEquipment" placeholder="e.g. 8 cameras, 8-channel DVR, 2TB HDD, cables, etc."></textarea></div>
+        <div class="field full"><label>Notes / Warranty / Other Information</label><textarea id="cNotes"></textarea></div>
+      </div><div class="actions"><button class="btn" type="submit">Save Customer</button><button class="btn secondary" type="reset" id="cReset">New Customer</button></div>
+    </form>
+  </div>
+  <div class="card"><div class="section-title">Customer and Site List</div><input id="customerSearch" placeholder="Search name, mobile or address..." style="margin-bottom:12px"><div class="tablewrap"><table><thead><tr><th>Customers / Sites</th><th>Contact</th><th>Quotation</th><th>Paid</th><th>Due*</th><th>Actions</th></tr></thead><tbody id="customerList"></tbody></table></div><p class="muted">*Outstanding balances may include recorded sales and payments.</p></div>
+</section>
+
+<section class="page" id="install">
+  <h2>Installation Jobs</h2><p class="sub">Record installation jobs, customers, charges and payments.</p>
+  <div class="card"><form id="installForm"><div class="formgrid">
+    <div class="field"><label>Customers / Sites *</label><select id="iCustomer" required></select></div>
+    <div class="field"><label>Job Date</label><input id="iDate" type="date"></div>
+    <div class="field"><label>Job / Equipment Details</label><input id="iDetails" placeholder="e.g. Installation of 4 cameras"></div>
+    <div class="field"><label>Total Charge ₹</label><input id="iAmount" type="number" min="0" step=".01" value="0"></div>
+    <div class="field"><label>Paid ₹</label><input id="iPaid" type="number" min="0" step=".01" value="0"></div>
+    <div class="field"><label>Status</label><select id="iStatus"><option>Pending</option><option>In Progress</option><option>Completed</option></select></div>
+    <div class="field full"><label>Note</label><textarea id="iNote"></textarea></div>
+  </div><div class="actions"><button class="btn" type="submit">Save Job</button></div></form></div>
+  <div class="card"><div class="section-title">Installation History</div><div class="tablewrap"><table><thead><tr><th>Date</th><th>Customer</th><th>Job</th><th>Charge</th><th>Paid</th><th>Status</th></tr></thead><tbody id="installList"></tbody></table></div></div>
+</section>
+
+<section class="page" id="payments">
+  <h2>Customer Payments</h2><p class="sub">Record additional payments received from customers.</p>
+  <div class="card"><form id="paymentForm"><div class="formgrid">
+    <div class="field"><label>Customer *</label><select id="payCustomer" required></select></div>
+    <div class="field"><label>Amount ₹ *</label><input id="payAmount" type="number" min=".01" step=".01" required></div>
+    <div class="field"><label>Date</label><input id="payDate" type="date"></div>
+    <div class="field"><label>Payment Method</label><select id="payMethod"><option>Cash</option><option>UPI</option><option>Bank</option><option>Other</option></select></div>
+    <div class="field full"><label>Note / Transaction ID</label><input id="payNote"></div>
+  </div><div class="actions"><button class="btn" type="submit">Save Payment</button></div></form></div>
+  <div class="card"><div class="section-title">Payment History</div><div class="tablewrap"><table><thead><tr><th>Date</th><th>Customer</th><th>Amount</th><th>Method</th><th>Note</th></tr></thead><tbody id="paymentList"></tbody></table></div></div>
+</section>
+
+<section class="page" id="expenses">
+  <h2>Expenses</h2><p class="sub">Record shop, transport, labor and other business expenses.</p>
+  <div class="card"><form id="expenseForm"><div class="formgrid">
+    <div class="field"><label>Expense Name *</label><input id="eTitle" required placeholder="Transport / Labour"></div>
+    <div class="field"><label>Amount ₹ *</label><input id="eAmount" type="number" min=".01" step=".01" required></div>
+    <div class="field"><label>Date</label><input id="eDate" type="date"></div>
+    <div class="field"><label>Category</label><input id="eCategory" placeholder="Shop / Travel / Other"></div>
+    <div class="field full"><label>Note</label><input id="eNote"></div>
+  </div><div class="actions"><button class="btn" type="submit">Save Expense</button></div></form></div>
+  <div class="card"><div class="section-title">Expense History</div><div class="tablewrap"><table><thead><tr><th>Date</th><th>Expense</th><th>Category</th><th>Amount</th><th>Note</th></tr></thead><tbody id="expenseList"></tbody></table></div></div>
+</section>
+
+<section class="page" id="reports">
+  <h2>Reports</h2><p class="sub">These reports are estimates based on recorded data, not tax or accounting statements.</p>
+  <div class="grid">
+    <div class="card"><div class="stat-label">Total Sales</div><div class="stat-value" id="rSales">₹0</div></div>
+    <div class="card"><div class="stat-label">Sales Received</div><div class="stat-value" id="rReceived">₹0</div></div>
+    <div class="card"><div class="stat-label">Installation Charges</div><div class="stat-value" id="rInstall">₹0</div></div>
+    <div class="card"><div class="stat-label">Total Recorded Expenses</div><div class="stat-value" id="rExpense">₹0</div></div>
+  </div>
+  <div class="card"><div class="section-title">Report Details</div><div class="tablewrap"><table><thead><tr><th>Reports</th><th>Amount</th></tr></thead><tbody id="reportDetails"></tbody></table></div></div>
+</section>
+
+<section class="page" id="quotations">
+<h2>Quotation Generator</h2><p class="sub">Create, save, print or share customer quotations.</p>
+<div class="card"><div class="formgrid">
+<div class="field"><label>Customer Name *</label><input id="qCustomer" required></div><div class="field"><label>Customer Mobile</label><input id="qPhone" inputmode="tel"></div>
+<div class="field full"><label>Customer Address</label><textarea id="qAddress"></textarea></div>
+<div class="field"><label>Product / Model</label><select id="qProduct"></select></div><div class="field"><label>Quantity</label><input id="qQty" type="number" min="1" value="1"></div>
+<div class="field"><label>Unit Price (₹)</label><input id="qPrice" type="number" min="0" step=".01" value="0"></div><div class="field"><label>GST (%)</label><input id="qGst" type="number" min="0" step=".01" value="18"></div>
+<div class="field"><label>Discount (₹)</label><input id="qDiscount" type="number" min="0" step=".01" value="0"></div>
+</div><div class="actions"><button class="btn" id="qAddItem" type="button">Add Item</button><button class="btn secondary" id="qClearItems" type="button">Clear Items</button></div>
+<div class="tablewrap"><table><thead><tr><th>Product / Model</th><th>Qty</th><th>Unit Price</th><th>Total</th><th></th></tr></thead><tbody id="qItems"></tbody></table></div>
+<div id="qTotals" style="margin-top:12px;font-weight:700"></div>
+<div class="actions"><button class="btn green" id="qSave" type="button">Save Quotation</button><button class="btn" id="qPrint" type="button">Print / Save as PDF</button><button class="btn secondary" id="qWhatsApp" type="button">Share on WhatsApp</button></div>
+</div>
+<div class="card"><div class="section-title">Saved Quotations</div><div class="tablewrap"><table><thead><tr><th>Quotation No.</th><th>Date</th><th>Customer</th><th>Total</th><th>Action</th></tr></thead><tbody id="qHistory"></tbody></table></div></div>
+</section>
+<section class="page" id="paymentSettings"><h2>Payment Settings</h2><p class="sub">Add your real payment details to show them on quotations. These fields are optional.</p>
+<div class="card"><div class="formgrid">
+<div class="field"><label>Bank Name</label><input id="setBankName"></div><div class="field"><label>Account Holder</label><input id="setAccountHolder"></div>
+<div class="field"><label>Account Number</label><input id="setAccountNumber" inputmode="numeric"></div><div class="field"><label>IFSC</label><input id="setIfsc"></div>
+<div class="field"><label>UPI ID</label><input id="setUpi"></div><div class="field"><label>QR Code Image (optional)</label><input id="setQr" type="file" accept="image/*"></div>
+</div><div id="qrPreview"></div><div class="actions"><button class="btn" id="saveSettings" type="button">Save Payment Settings</button></div></div></section>
+\n<section class="page" id="backup">
+  <h2>Backup / Restore</h2><p class="sub">Download a copy of your stock, customers and accounts.</p>
+  <div class="notice">Keep backup files in a safe place. Restoring may replace current data. Download a backup of current data first.</div>
+  <div class="card"><div class="section-title">Backup</div>
+    <p>Last local backup: <strong id="lastBackup">No information yet</strong></p>
+    <div class="actions"><button class="btn" id="backupNow" type="button">⬇ Backup Now (JSON)</button><button class="btn secondary" id="exportCSV" type="button">CSV Export</button></div>
+  </div>
+  <div class="card"><div class="section-title">Restore Backup</div><p class="muted">Select a JSON backup file previously downloaded from this software. Restoring will replace current data with the backup data.</p>
+    <div class="field"><label>JSON Backup File</label><input id="restoreFile" type="file" accept=".json,application/json"></div>
+    <div class="actions"><button class="btn danger" id="restoreNow" type="button">Restore</button></div>
+  </div>
+  <div class="card"><div class="section-title">Data Storage</div><p class="muted">Data is currently saved in this browser. Automatic Google Drive sync requires separate Google OAuth and Drive API setup; this button alone does not sync to Drive.</p></div>
+</section>
+</main>
+<script>
+const KEY='secure_track_business_manager_v2';
+const $=id=>document.getElementById(id);
+const emptyDB=()=>({products:[],customers:[],purchases:[],sales:[],installations:[],expenses:[],payments:[],scanLogs:[],quotations:[],settings:{bankName:'',accountHolder:'',accountNumber:'',ifsc:'',upiId:'',qrData:''}});
+let db;
+try{db={...emptyDB(),...JSON.parse(localStorage.getItem(KEY)||'{}')}}catch(e){db=emptyDB()}
+for(const k of ['products','customers','purchases','sales','installations','expenses','payments','scanLogs','quotations'])if(!Array.isArray(db[k]))db[k]=[]; if(!db.settings||typeof db.settings!=='object')db.settings={bankName:'',accountHolder:'',accountNumber:'',ifsc:'',upiId:'',qrData:''};
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,7);
+const val=id=>$(id).value.trim();
+const num=id=>Math.max(0,Number($(id).value)||0);
+const money=n=>'₹'+(Number(n)||0).toLocaleString('en-IN',{maximumFractionDigits:2});
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const today=()=>new Date().toISOString().slice(0,10);
+const prod=id=>db.products.find(x=>x.id===id);
+const cust=id=>db.customers.find(x=>x.id===id);
+const cname=id=>cust(id)?.name||'—';
+const total=a=>a.reduce((s,x)=>s+(Number(x.total)||0),0);
+const saleDue=s=>(Number(s.total)||0)-(Number(s.paid)||0);
+function due(c){
+ const sales=db.sales.filter(s=>s.customerId===c.id).reduce((a,s)=>a+saleDue(s),0);
+ const installs=db.installations.filter(i=>i.customerId===c.id).reduce((a,i)=>a+(Number(i.amount)||0)-(Number(i.paid)||0),0);
+ const payments=db.payments.filter(p=>p.customerId===c.id).reduce((a,p)=>a+(Number(p.amount)||0),0);
+ return Math.max(0,(Number(c.openingDue)||0)+sales+installs-payments);
+}
+function save(){
+ try{localStorage.setItem(KEY,JSON.stringify(db));render()}
+ catch(e){alert('Could not save data. Free up phone storage and create a backup.')}
+}
+function tableRows(id,rows,cols){
+ $(id).innerHTML=rows.length?rows.map(r=>'<tr>'+cols.map(c=>'<td>'+c(r)+'</td>').join('')+'</tr>').join(''):'<tr><td class="empty" colspan="'+cols.length+'">No entries yet.</td></tr>';
+}
+function setOptions(id,items,placeholder){
+ const el=$(id),old=el.value;
+ el.innerHTML='<option value="">'+esc(placeholder)+'</option>'+items.map(x=>'<option value="'+esc(x.id)+'">'+esc(x.name)+'</option>').join('');
+ if(items.some(x=>x.id===old))el.value=old;
+}
+function go(page){
+ document.querySelectorAll('.page').forEach(p=>p.classList.toggle('active',p.id===page));
+ document.querySelectorAll('.menu').forEach(b=>b.classList.toggle('active',b.dataset.page===page));
+ closeMenu();window.scrollTo(0,0);
+}
+function openMenu(){$('sidebar').classList.add('open');$('overlay').classList.add('show')}
+function closeMenu(){$('sidebar').classList.remove('open');$('overlay').classList.remove('show')}
+$('openMenu').onclick=openMenu;$('closeMenu').onclick=closeMenu;$('overlay').onclick=closeMenu;
+document.querySelectorAll('.menu').forEach(b=>b.onclick=()=>go(b.dataset.page));
+function render(){
+ // Add new fields to existing customer records without deleting old information.
+ db.customers.forEach(c=>{
+  if(c.altPhone===undefined)c.altPhone='';
+  if(c.quote===undefined)c.quote=0;
+  if(c.openingDue===undefined)c.openingDue=0;
+  if(c.received===undefined)c.received=0;
+  if(c.installDate===undefined)c.installDate='';
+  if(c.equipment===undefined)c.equipment='';
+  if(c.notes===undefined)c.notes='';
+ });
+ $('dProducts').textContent=db.products.length;
+ $('dStockValue').textContent=money(db.products.reduce((a,p)=>a+(Number(p.qty)||0)*(Number(p.cost)||0),0));
+ $('dSales').textContent=money(total(db.sales));
+ $('dDue').textContent=money(db.customers.reduce((a,c)=>a+due(c),0));
+ $('dCustomers').textContent=db.customers.length;
+ $('dLow').textContent=db.products.filter(p=>(Number(p.qty)||0)<=(Number(p.min)||0)).length;
+ $('dInstalls').textContent=db.installations.length;
+ $('dExpenses').textContent=money(total(db.expenses));
+ const received=db.sales.reduce((a,s)=>a+(Number(s.paid)||0),0);
+ const saleTotal=total(db.sales);
+ const pct=saleTotal?Math.min(100,Math.round(received/saleTotal*100)):0;
+ $('gaugePct').textContent=pct+'%';
+ $('gaugeText').textContent=saleTotal?'Received out of sales: '+money(received)+' received.':'The indicator updates when sales are recorded.';
+ const angle=pct*3.6;
+ document.querySelector('.gauge').style.background='conic-gradient(var(--green) 0deg '+angle+'deg,#e7edf6 '+angle+'deg 360deg)';
+ const low=db.products.filter(p=>(Number(p.qty)||0)<=(Number(p.min)||0));
+ $('lowStock').innerHTML=low.length?low.map(p=>'<div style="padding:8px 0;border-bottom:1px solid var(--line)"><b>'+esc(p.name)+'</b><br><span class="muted">Due: '+p.qty+' | Threshold: '+(p.min||0)+'</span></div>').join(''):'No low-stock alerts.';
+ const activity=[
+ ...db.sales.map(x=>({date:x.date,text:'Sale: '+(prod(x.productId)?.name||'Product'),amount:x.total})),
+ ...db.purchases.map(x=>({date:x.date,text:'Purchase: '+(prod(x.productId)?.name||'Product'),amount:x.total})),
+ ...db.payments.map(x=>({date:x.date,text:'Payment: '+cname(x.customerId),amount:x.amount}))
+ ].sort((a,b)=>(b.date||'').localeCompare(a.date||'')).slice(0,6);
+ $('recent').innerHTML=activity.length?activity.map(x=>'<div style="padding:9px 0;border-bottom:1px solid var(--line)">'+esc(x.date||'')+' — '+esc(x.text)+' <b>'+money(x.amount)+'</b></div>').join(''):'No entries yet.';
+ setOptions('buyProduct',db.products,'Select product');
+ setOptions('saleProduct',db.products,'Select product');
+ setOptions('saleCustomer',db.customers,'Select customer (optional)');
+ setOptions('iCustomer',db.customers,'Select customer');
+ setOptions('payCustomer',db.customers,'Select customer');
+  setOptions('scanProduct',db.products,'Select product/model'); setOptions('qProduct',db.products,'Select product/model');
+ const q=($('stockSearch')?.value||'').toLowerCase();
+ tableRows('stockList',db.products.filter(p=>(p.name+' '+(p.sku||'')+' '+(p.category||'')).toLowerCase().includes(q)),[
+ p=>'<b>'+esc(p.name)+'</b><br><span class="muted">'+esc(p.sku||p.category||'')+'</span>',
+ p=>esc(p.qty),p=>money(p.cost),p=>money(p.price),
+ p=>'<button class="btn secondary" data-edit-product="'+p.id+'">Edit</button> <button class="btn danger" data-del-product="'+p.id+'">Delete</button>'
+ ]);
+ tableRows('purchaseList',[...db.purchases].reverse(),[
+ x=>esc(x.date),x=>esc(prod(x.productId)?.name||'Deleted product'),x=>esc(x.qty),x=>money(x.total),x=>esc(x.supplier||'—')
+ ]);
+ tableRows('salesList',[...db.sales].reverse(),[
+ x=>esc(x.date),x=>esc(prod(x.productId)?.name||'Deleted product'),x=>esc(cname(x.customerId)),x=>money(x.total),x=>money(x.paid),x=>money(saleDue(x))
+ ]);
+ const cq=($('customerSearch')?.value||'').toLowerCase();
+ tableRows('customerList',db.customers.filter(c=>(c.name+' '+c.phone+' '+(c.address||'')).toLowerCase().includes(cq)),[
+ c=>'<b>'+esc(c.name)+'</b><br><span class="muted">'+esc(c.address||'No address provided')+'</span><br><span class="muted">Alt: '+esc(c.altPhone||'—')+'</span>',
+ c=>esc(c.phone),
+ c=>money(c.quote),
+ c=>money((Number(c.received)||0)+db.sales.filter(s=>s.customerId===c.id).reduce((a,s)=>a+(Number(s.paid)||0),0)+db.installations.filter(i=>i.customerId===c.id).reduce((a,i)=>a+(Number(i.paid)||0),0)),
+ c=>'<b>'+money(due(c))+'</b>',
+ c=>'<button class="btn secondary" data-edit-customer="'+c.id+'">Edit</button>'
+ ]);
+ tableRows('installList',[...db.installations].reverse(),[
+ x=>esc(x.date),x=>esc(cname(x.customerId)),x=>esc(x.details||'—'),x=>money(x.amount),x=>money(x.paid),x=>esc(x.status||'Pending')
+ ]);
+ tableRows('paymentList',[...db.payments].reverse(),[
+ x=>esc(x.date),x=>esc(cname(x.customerId)),x=>money(x.amount),x=>esc(x.method||'Cash'),x=>esc(x.note||'—')
+ ]);
+ tableRows('expenseList',[...db.expenses].reverse(),[
+ x=>esc(x.date),x=>esc(x.title),x=>esc(x.category||'—'),x=>money(x.amount),x=>esc(x.note||'—')
+ ]);
+ const inst=total(db.installations.map(i=>({total:i.amount})));
+ const expenses=total(db.expenses);
+ const margin=db.sales.reduce((a,s)=>a+(Number(s.total)||0)-(Number(prod(s.productId)?.cost)||0)*(Number(s.qty)||0),0);
+ $('rSales').textContent=money(saleTotal);
+ $('rReceived').textContent=money(received);
+ $('rInstall').textContent=money(inst);
+ $('rExpense').textContent=money(expenses);
+ tableRows('reportDetails',[
+ {label:'Installation charges',amount:inst},
+ {label:'Sales received',amount:received},
+ {label:'Estimated gross margin',amount:margin},
+ {label:'After recorded expenses (estimate)',amount:margin-expenses}
+ ],[x=>esc(x.label),x=>money(x.amount)]);
+}
+function resetCustomerForm(){
+ $('customerForm').reset();$('cId').value='';$('cOpening').value='0';$('cQuote').value='0';$('cReceived').value='0';
+}
+$('pReset').onclick=()=>setTimeout(()=>$('pId').value='',0);
+$('cReset').onclick=()=>setTimeout(resetCustomerForm,0);
+
+$('productForm').addEventListener('submit',e=>{
+ e.preventDefault();
+ const id=val('pId'),data={name:val('pName'),sku:val('pSku'),category:val('pCategory'),qty:num('pQty'),cost:num('pCost'),price:num('pPrice'),min:num('pMin'),note:val('pNote')};
+ if(id)Object.assign(prod(id),data);else db.products.push({id:uid(),...data});
+ $('productForm').reset();$('pId').value='';$('pQty').value='0';$('pCost').value='0';$('pPrice').value='0';$('pMin').value='2';save();
+});
+$('stockList').addEventListener('click',e=>{
+ const edit=e.target.closest('[data-edit-product]')?.dataset.editProduct;
+ const del=e.target.closest('[data-del-product]')?.dataset.delProduct;
+ if(edit){const p=prod(edit);if(!p)return;$('pId').value=p.id;$('pName').value=p.name||'';$('pSku').value=p.sku||'';$('pCategory').value=p.category||'';$('pQty').value=p.qty||0;$('pCost').value=p.cost||0;$('pPrice').value=p.price||0;$('pMin').value=p.min||0;$('pNote').value=p.note||'';go('stock');window.scrollTo(0,0)}
+ if(del&&confirm('Delete this product? Its name may no longer appear in older transactions.')){db.products=db.products.filter(p=>p.id!==del);save()}
+});
+$('stockSearch').addEventListener('input',render);
+
+$('customerForm').addEventListener('submit',e=>{
+ e.preventDefault();
+ const id=val('cId');
+ const data={name:val('cName'),phone:val('cPhone'),altPhone:val('cAltPhone'),address:val('cAddress'),quote:num('cQuote'),openingDue:num('cOpening'),received:num('cReceived'),installDate:val('cInstallDate'),equipment:val('cEquipment'),notes:val('cNotes')};
+ if(id)Object.assign(cust(id),data);else db.customers.push({id:uid(),...data});
+ resetCustomerForm();save();
+});
+$('customerList').addEventListener('click',e=>{
+ const id=e.target.closest('[data-edit-customer]')?.dataset.editCustomer;if(!id)return;
+ const c=cust(id);if(!c)return;
+ $('cId').value=c.id;$('cName').value=c.name||'';$('cPhone').value=c.phone||'';$('cAltPhone').value=c.altPhone||'';
+ $('cAddress').value=c.address||'';$('cQuote').value=c.quote||0;$('cOpening').value=c.openingDue||0;
+ $('cReceived').value=c.received||0;$('cInstallDate').value=c.installDate||'';
+ $('cEquipment').value=c.equipment||'';$('cNotes').value=c.notes||'';go('customers');window.scrollTo(0,0);
+});
+$('customerSearch').addEventListener('input',render);
+
+$('buyProduct').addEventListener('change',()=>{const p=prod(val('buyProduct'));if(p)$('buyCost').value=p.cost||0});
+$('purchaseForm').addEventListener('submit',e=>{
+ e.preventDefault();const p=prod(val('buyProduct')),qty=num('buyQty'),cost=num('buyCost');if(!p)return alert('Add a product first.');
+ p.qty=(Number(p.qty)||0)+qty;p.cost=cost;
+ db.purchases.push({id:uid(),productId:p.id,qty,cost,total:qty*cost,supplier:val('buySupplier'),date:val('buyDate')||today(),note:val('buyNote')});
+ $('purchaseForm').reset();$('buyQty').value=1;$('buyCost').value=0;save();
+});
+$('saleProduct').addEventListener('change',()=>{const p=prod(val('saleProduct'));if(p)$('salePrice').value=p.price||0});
+$('saleForm').addEventListener('submit',e=>{
+ e.preventDefault();const p=prod(val('saleProduct')),qty=num('saleQty'),price=num('salePrice'),paid=num('salePaid');
+ if(!p)return alert('Add a product first.');
+ if(qty>(Number(p.qty)||0))return alert('Only '+p.qty+' units available in stock.');
+ const sum=qty*price;if(paid>sum)return alert('Amount paid cannot exceed total sales.');
+ p.qty-=qty;db.sales.push({id:uid(),productId:p.id,customerId:val('saleCustomer'),qty,price,total:sum,paid,date:val('saleDate')||today(),note:val('saleNote')});
+ $('saleForm').reset();$('saleQty').value=1;$('salePrice').value=0;$('salePaid').value=0;save();
+});
+$('installForm').addEventListener('submit',e=>{
+ e.preventDefault();const amount=num('iAmount'),paid=num('iPaid');if(paid>amount)return alert('Paid amount cannot exceed the total charge.');
+ db.installations.push({id:uid(),customerId:val('iCustomer'),date:val('iDate')||today(),details:val('iDetails'),amount,paid,status:val('iStatus'),note:val('iNote')});
+ $('installForm').reset();$('iAmount').value=0;$('iPaid').value=0;save();
+});
+$('paymentForm').addEventListener('submit',e=>{
+ e.preventDefault();db.payments.push({id:uid(),customerId:val('payCustomer'),amount:num('payAmount'),date:val('payDate')||today(),method:val('payMethod'),note:val('payNote')});
+ $('paymentForm').reset();save();
+});
+$('expenseForm').addEventListener('submit',e=>{
+ e.preventDefault();db.expenses.push({id:uid(),title:val('eTitle'),amount:num('eAmount'),date:val('eDate')||today(),category:val('eCategory'),note:val('eNote')});
+ $('expenseForm').reset();save();
+});
+
+function download(name,content,type){
+ const blob=new Blob([content],{type}),url=URL.createObjectURL(blob),a=document.createElement('a');
+ a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1500);
+}
+function backup(){
+ const stamp=new Date().toLocaleString('en-IN');
+ const payload={...db,backupCreatedAt:new Date().toISOString(),app:'Secure Track Security CCTV Manager'};
+ download('secure-track-backup-'+today()+'.json',JSON.stringify(payload,null,2),'application/json');
+ localStorage.setItem(KEY,JSON.stringify(db));
+ localStorage.setItem(KEY+'_last_backup',stamp);
+ $('lastBackup').textContent=stamp;
+}
+$('backupNow').onclick=backup;$('headerBackup').onclick=()=>{go('backup');backup()};
+$('lastBackup').textContent=localStorage.getItem(KEY+'_last_backup')||'No information yet';
+
+$('exportCSV').onclick=()=>{
+ const rows=[['Record Type','Date','Name / Product','Details','Quantity','Amount','Paid','Due','Notes']];
+ const add=(type,date,name,details,qty,amount,paid,due,notes)=>rows.push([type,date,name,details,qty,amount,paid,due,notes]);
+ db.products.forEach(p=>add('Product','',p.name,p.sku||p.category,p.qty,p.price,'','',''));
+ db.customers.forEach(c=>add('Customer','',c.name,c.phone,'',c.quote,c.received,c.openingDue,c.address));
+ db.purchases.forEach(x=>add('Purchase',x.date,prod(x.productId)?.name,x.supplier,x.qty,x.total,'','',x.note));
+ db.sales.forEach(x=>add('Sale',x.date,prod(x.productId)?.name,cname(x.customerId),x.qty,x.total,x.paid,saleDue(x),x.note));
+ db.installations.forEach(x=>add('Installation',x.date,cname(x.customerId),x.details,'',x.amount,x.paid,(Number(x.amount)||0)-(Number(x.paid)||0),x.note));
+ db.payments.forEach(x=>add('Payment',x.date,cname(x.customerId),x.method,'',x.amount,'','',''+(x.note||'')));
+ db.expenses.forEach(x=>add('Expense',x.date,x.title,x.category,'',x.amount,'','',x.note));
+ db.scanLogs.forEach(x=>add('Serial Scan',x.scannedAt,x.productName,x.serialNumber,1,'','','',''));
+ const csv=rows.map(row=>row.map(v=>'"'+String(v??'').replace(/"/g,'""')+'"').join(',')).join('\r\n');
+ download('secure-track-business-export-'+today()+'.csv','\ufeff'+csv,'text/csv;charset=utf-8');
+};
+$('restoreNow').onclick=()=>{
+ const file=$('restoreFile').files[0];if(!file)return alert('Select a JSON backup file first.');
+ if(!confirm('Restore will replace current data with the backup. Have you backed up the current data?'))return;
+ const reader=new FileReader();
+ reader.onload=()=>{
+  try{
+   const data=JSON.parse(reader.result);
+   const next={...emptyDB()};
+   for(const k of ['products','customers','purchases','sales','installations','expenses','payments','scanLogs','quotations']){
+    if(Array.isArray(data[k]))next[k]=data[k];
+    else if(['scanLogs','quotations'].includes(k))next[k]=[];
+    else throw new Error('Backup is missing the '+k+' list.');
+   }
+   next.settings={...emptyDB().settings,...(data.settings&&typeof data.settings==='object'?data.settings:{})};
+   for(const c of next.customers){if(!c.id)c.id=uid();if(c.openingDue===undefined)c.openingDue=0}
+   db=next;localStorage.setItem(KEY,JSON.stringify(db));render();alert('Restore completed.');$('restoreFile').value='';
+  }catch(err){alert('Restore failed: '+err.message)}
+ };
+ reader.readAsText(file);
+};
+
+let pendingSerials=[];
+const scanProduct=()=>prod(val('scanProduct'));
+function renderScans(){
+ $('scanCount').textContent=pendingSerials.length;
+ $('scanList').innerHTML=pendingSerials.length?pendingSerials.map((x,i)=>'<tr><td>'+esc(x.serialNumber)+'</td><td>'+esc(x.scannedAt)+'</td><td><button class="btn danger" type="button" data-remove-scan="'+i+'">Remove</button></td></tr>').join(''):'<tr><td class="empty" colspan="3">No serials scanned yet.</td></tr>';
+}
+function addSerial(){
+ const p=scanProduct(),serial=val('scanSerial');
+ if(!p)return alert('Select a product/model first.');
+ if(!serial)return alert('Scan or enter a serial number.');
+ const normalized=serial.toLowerCase();
+ if((p.serials||[]).some(x=>String(x.serialNumber||x).toLowerCase()===normalized)||pendingSerials.some(x=>x.productId===p.id&&x.serialNumber.toLowerCase()===normalized)){alert('Duplicate serial number. It was not counted.');$('scanSerial').select();return}
+ pendingSerials.push({productId:p.id,serialNumber:serial,scannedAt:new Date().toLocaleString('en-IN')});
+ $('scanSerial').value='';renderScans();$('scanSerial').focus();
+}
+$('addSerial').onclick=addSerial;
+$('scanSerial').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();addSerial()}});
+$('scanList').addEventListener('click',e=>{const b=e.target.closest('[data-remove-scan]');if(b){pendingSerials.splice(Number(b.dataset.removeScan),1);renderScans()}});
+$('clearScans').onclick=()=>{pendingSerials=[];renderScans()};
+$('confirmScans').onclick=()=>{
+ if(!pendingSerials.length)return alert('Scan at least one unique serial number first.');
+ const p=scanProduct();if(!p||pendingSerials.some(x=>x.productId!==p.id))return alert('Select the same product/model used for the pending scans.');
+ p.serials=Array.isArray(p.serials)?p.serials:[];
+ pendingSerials.forEach(x=>{p.serials.push({serialNumber:x.serialNumber,scannedAt:x.scannedAt});db.scanLogs.push({...x,productName:p.name,sku:p.sku||''})});
+ p.qty=(Number(p.qty)||0)+pendingSerials.length;
+ const count=pendingSerials.length;pendingSerials=[];renderScans();save();alert(count+' scanned unit(s) added to stock.');
+};
+let quoteItems=[];
+const quoteTotals=()=>{const subtotal=quoteItems.reduce((a,x)=>a+x.qty*x.price,0),discount=num('qDiscount'),taxable=Math.max(0,subtotal-discount),gst=taxable*num('qGst')/100;return {subtotal,discount,gst,total:taxable+gst}};
+function renderQuoteItems(){
+ $('qItems').innerHTML=quoteItems.length?quoteItems.map((x,i)=>'<tr><td>'+esc(x.name)+' '+esc(x.model||'')+'</td><td>'+x.qty+'</td><td>'+money(x.price)+'</td><td>'+money(x.qty*x.price)+'</td><td><button class="btn danger" type="button" data-qremove="'+i+'">Remove</button></td></tr>').join(''):'<tr><td class="empty" colspan="5">No quotation items added yet.</td></tr>';
+ const t=quoteTotals();$('qTotals').innerHTML='Subtotal: '+money(t.subtotal)+' &nbsp; Discount: '+money(t.discount)+' &nbsp; GST: '+money(t.gst)+' &nbsp; <strong>Grand Total: '+money(t.total)+'</strong>';
+}
+$('qProduct').addEventListener('change',()=>{const p=prod(val('qProduct'));if(p)$('qPrice').value=p.price||0});
+$('qAddItem').onclick=()=>{const p=prod(val('qProduct')),qty=Math.floor(num('qQty')),price=num('qPrice');if(!p)return alert('Select a product/model.');if(qty<1)return alert('Quantity must be at least 1.');quoteItems.push({productId:p.id,name:p.name,model:p.sku||'',qty,price});renderQuoteItems()};
+$('qClearItems').onclick=()=>{quoteItems=[];renderQuoteItems()};
+$('qItems').addEventListener('click',e=>{const b=e.target.closest('[data-qremove]');if(b){quoteItems.splice(Number(b.dataset.qremove),1);renderQuoteItems()}});
+function quoteSnapshot(){
+ if(!val('qCustomer')){alert('Enter the customer name.');return null}
+ if(!quoteItems.length){alert('Add at least one quotation item.');return null}
+ const t=quoteTotals();return {id:uid(),number:'STS-'+today().replace(/-/g,'')+'-'+String(db.quotations.length+1).padStart(3,'0'),date:today(),customer:val('qCustomer'),phone:val('qPhone'),address:val('qAddress'),items:quoteItems.map(x=>({...x})),gstRate:num('qGst'),discount:t.discount,subtotal:t.subtotal,gst:t.gst,total:t.total};
+}
+function quoteText(q){return 'Secure Track Security\\nCCTV Sales & Installation | WhatsApp: 7703063006\\nQuotation: '+q.number+' | Date: '+q.date+'\\nCustomer: '+q.customer+'\\nMobile: '+(q.phone||'-')+'\\nAddress: '+(q.address||'-')+'\\n'+q.items.map(x=>x.name+(x.model?' ('+x.model+')':'')+' x '+x.qty+' @ '+money(x.price)+' = '+money(x.qty*x.price)).join('\\n')+'\\nSubtotal: '+money(q.subtotal)+'\\nDiscount: '+money(q.discount)+'\\nGST ('+q.gstRate+'%): '+money(q.gst)+'\\nGRAND TOTAL: '+money(q.total)}
+function printQuote(q){
+ const st=db.settings||{},pay=[st.bankName?'Bank: '+st.bankName:'',st.accountHolder?'Account Holder: '+st.accountHolder:'',st.accountNumber?'Account Number: '+st.accountNumber:'',st.ifsc?'IFSC: '+st.ifsc:'',st.upiId?'UPI ID: '+st.upiId:''].filter(Boolean).join('<br>');
+ const rows=q.items.map(x=>'<tr><td>'+esc(x.name)+' '+esc(x.model||'')+'</td><td>'+x.qty+'</td><td>'+money(x.price)+'</td><td>'+money(x.qty*x.price)+'</td></tr>').join('');
+ const w=window.open('','_blank');if(!w){alert('Allow pop-ups to print or save as PDF.');return}
+ w.document.write('<!doctype html><html><head><title>'+esc(q.number)+'</title><meta name="viewport" content="width=device-width"><style>body{font:14px Arial;padding:28px;color:#172033}h1{margin-bottom:4px}table{width:100%;border-collapse:collapse;margin-top:24px}td,th{border:1px solid #ddd;padding:10px;text-align:left}.right{text-align:right}.muted{color:#666}</style></head><body><h1>SECURE TRACK SECURITY</h1><div>CCTV Sales & Installation | WhatsApp: 7703063006</div><hr><h2>QUOTATION</h2><p><b>Quotation No:</b> '+esc(q.number)+' &nbsp; <b>Date:</b> '+esc(q.date)+'</p><p><b>Customer:</b> '+esc(q.customer)+'<br><b>Mobile:</b> '+esc(q.phone||'-')+'<br><b>Address:</b> '+esc(q.address||'-')+'</p><table><thead><tr><th>Product / Model</th><th>Qty</th><th>Unit Price</th><th>Total</th></tr></thead><tbody>'+rows+'</tbody></table><p class="right">Subtotal: '+money(q.subtotal)+'<br>Discount: '+money(q.discount)+'<br>GST ('+q.gstRate+'%): '+money(q.gst)+'</p><h2 class="right">Grand Total: '+money(q.total)+'</h2>'+(pay?'<h3>Payment Details</h3>'+pay:'')+(st.qrData?'<p><img style="max-width:150px;max-height:150px" src="'+st.qrData+'"></p>':'')+'<p class="muted">Thank you for your business.</p><button onclick="window.print()">Print / Save as PDF</button><script>setTimeout(()=>window.print(),400)<\/script></body></html>');
+ w.document.close();
+}
+$('qSave').onclick=()=>{const q=quoteSnapshot();if(!q)return;db.quotations.push(q);save();alert('Quotation saved: '+q.number)};
+$('qPrint').onclick=()=>{const q=quoteSnapshot();if(q)printQuote(q)};
+$('qWhatsApp').onclick=()=>{const q=quoteSnapshot();if(q)window.open('https://wa.me/?text='+encodeURIComponent(quoteText(q)),'_blank')};
+function renderQuoteHistory(){$('qHistory').innerHTML=db.quotations.length?[...db.quotations].reverse().map(q=>'<tr><td>'+esc(q.number)+'</td><td>'+esc(q.date)+'</td><td>'+esc(q.customer)+'</td><td>'+money(q.total)+'</td><td><button class="btn secondary" data-qopen="'+esc(q.id)+'">Open / PDF</button></td></tr>').join(''):'<tr><td class="empty" colspan="5">No saved quotations yet.</td></tr>'}
+$('qHistory').addEventListener('click',e=>{const b=e.target.closest('[data-qopen]');if(b){const q=db.quotations.find(x=>x.id===b.dataset.qopen);if(q)printQuote(q)}});
+$('saveSettings').onclick=()=>{db.settings={...db.settings,bankName:val('setBankName'),accountHolder:val('setAccountHolder'),accountNumber:val('setAccountNumber'),ifsc:val('setIfsc'),upiId:val('setUpi')};save();alert('Payment settings saved.')};
+$('setQr').addEventListener('change',e=>{const file=e.target.files[0];if(!file)return;if(file.size>1500000)return alert('Please choose a QR image smaller than 1.5 MB.');const reader=new FileReader();reader.onload=()=>{db.settings.qrData=reader.result;$('qrPreview').innerHTML='<img alt="Payment QR preview" style="max-width:140px;max-height:140px" src="'+reader.result+'">';save()};reader.readAsDataURL(file)});
+function loadSettings(){const x=db.settings||{}; $('setBankName').value=x.bankName||'';$('setAccountHolder').value=x.accountHolder||'';$('setAccountNumber').value=x.accountNumber||'';$('setIfsc').value=x.ifsc||'';$('setUpi').value=x.upiId||'';if(x.qrData)$('qrPreview').innerHTML='<img alt="Payment QR preview" style="max-width:140px;max-height:140px" src="'+x.qrData+'">'}
+const baseRender=render;render=function(){baseRender();renderQuoteItems();renderQuoteHistory()};
+loadSettings();renderScans();renderQuoteItems();renderQuoteHistory();
+
+document.querySelectorAll('input[type=date]').forEach(el=>{if(!el.value)el.value=today()});
+render();
+</script>
+</body>
+</html>
