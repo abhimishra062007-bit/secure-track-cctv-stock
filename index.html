@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="hi">
 <head>
@@ -46,7 +45,7 @@ footer{text-align:center;color:var(--muted);font-size:12px;padding:20px}
 <p>CCTV Stock · Sales · Installation · Accounts</p>
 </header>
 <main>
-<div class="notice">यह संस्करण डेटा इसी ब्राउज़र में सेव करता है। नियमित Backup डाउनलोड करें। मोबाइल और लैपटॉप में एक ही डेटा देखने के लिए बाद में Cloud Database जोड़ना होगा।</div>
+<div class="notice">यह संस्करण डेटा इसी ब्राउज़र में सेव करता है। मोबाइल और लैपटॉप में एक ही डेटा देखने के लिए बाद में Cloud Database जोड़ना होगा।</div>
 <nav id="nav">
 <button class="active" data-page="dashboard">Dashboard</button>
 <button data-page="stock">Stock</button>
@@ -150,14 +149,25 @@ footer{text-align:center;color:var(--muted);font-size:12px;padding:20px}
 <div class="panel"><h3>Expense History</h3><div id="expenseHistory" class="tablebox"></div></div>
 </div></section>
 
-<section id="reports" class="page"><div class="panel"><h3>Business Reports</h3><div class="cards" id="reportStats"></div><div id="reportDetails"></div></div></section>
-<section id="backup" class="page"><div class="panel"><h3>Backup & Restore</h3><p class="muted">Restore करने पर मौजूदा डेटा replace होगा। पहले backup डाउनलोड करें।</p><div class="actions"><button class="primary" id="backupBtn">Download JSON Backup</button><label class="btn">Restore Backup <input type="file" id="restoreFile" accept=".json,application/json" hidden></label><button id="csvBtn">Export CSV</button><button class="danger" id="clearBtn">Delete All Data</button></div><p id="backupMsg" class="muted"></p></div></section>
+<section id="reports" class="page">
+<div class="panel"><h3>Business Reports</h3><div class="cards" id="reportStats"></div><div id="reportDetails"></div></div>
+</section>
+
+<section id="backup" class="page">
+<div class="panel"><h3>Backup & Restore</h3>
+<p class="muted">Restore करने पर मौजूदा डेटा replace होगा।</p>
+<div class="actions">
+<button class="primary" id="backupBtn">Download JSON Backup</button>
+<label class="btn">Restore Backup <input type="file" id="restoreFile" accept=".json,application/json" hidden></label>
+<button id="csvBtn">Export CSV</button>
+<button class="danger" id="clearBtn">Delete All Data</button>
+</div>
+<p id="backupMsg" class="muted"></p>
+</div></section>
+
 <footer>Secure Track Security · Indore · CCTV Sales & Installation</footer>
 </main>
-<!-- Part 2 yahin se shuru hoga -->
-  
-<script>
-const KEY='secure_track_business_manager_v2';
+<script>const KEY='secure_track_business_manager_v2';
 const emptyDB=()=>({products:[],customers:[],purchases:[],sales:[],installations:[],expenses:[],payments:[]});
 let db;
 try{db={...emptyDB(),...JSON.parse(localStorage.getItem(KEY)||'{}')}}catch(e){db=emptyDB()}
@@ -175,50 +185,210 @@ function row(cells){return '<tr>'+cells.map(x=>'<td>'+x+'</td>').join('')+'</tr>
 function due(c){return Number(c.openingDue||0)+db.sales.filter(s=>s.customerId===c.id).reduce((a,s)=>a+s.total-s.paid,0)+db.installations.filter(i=>i.customer===c.name).reduce((a,i)=>a+i.amount-i.paid,0)-db.payments.filter(p=>p.customerId===c.id).reduce((a,p)=>a+p.amount,0)}
 function save(){localStorage.setItem(KEY,JSON.stringify(db));render()}
 function setOptions(id,items,placeholder){const el=$(id),old=el.value;el.innerHTML='<option value="">'+placeholder+'</option>'+items.map(i=>'<option value="'+esc(i.id)+'">'+esc(i.label)+'</option>').join('');if(items.some(i=>i.id===old))el.value=old}
+
 function render(){
 const stockQty=db.products.reduce((a,p)=>a+p.qty,0);
 const stockValue=db.products.reduce((a,p)=>a+p.qty*p.cost,0);
 const salesTotal=db.sales.reduce((a,s)=>a+s.total,0);
 const dueTotal=db.customers.reduce((a,c)=>a+due(c),0);
+
 $('stats').innerHTML=[['Products',db.products.length],['Units in stock',stockQty],['Stock value',money(stockValue)],['Total sales',money(salesTotal)]].map(x=>'<div class="card"><small>'+x[0]+'</small><strong>'+x[1]+'</strong></div>').join('');
+
 const low=db.products.filter(p=>p.qty<=p.min);
 $('lowStock').innerHTML=low.length?low.map(p=>'<p class="red">⚠ '+esc(p.name)+' — '+p.qty+' बाकी</p>').join(''):'<p class="green">सभी प्रोडक्ट का स्टॉक ठीक है।</p>';
+
 const recent=[...db.sales.map(s=>({type:'Sale',date:s.date,name:prod(s.productId)?.name||'Product',amount:s.total})),...db.purchases.map(s=>({type:'Purchase',date:s.date,name:prod(s.productId)?.name||'Product',amount:s.total})),...db.expenses.map(s=>({type:'Expense',date:s.date,name:s.title,amount:s.amount}))].reverse().slice(0,7);
 $('recent').innerHTML=recent.length?recent.map(x=>'<p><b>'+x.type+': '+esc(x.name)+'</b><br><small class="muted">'+esc(x.date)+' · '+money(x.amount)+'</small></p>').join(''):'<div class="empty">अभी कोई ट्रांजैक्शन नहीं है।</div>';
+
 const search=($('searchStock').value||'').toLowerCase();
 $('inventory').innerHTML=table(['Product','Qty','Cost','Sale','Supplier / Serial','Action'],db.products.filter(p=>(p.name+' '+p.model+' '+p.supplier).toLowerCase().includes(search)).map(p=>row([esc(p.name)+'<br><small>'+esc(p.category+' '+(p.model||''))+'</small>',p.qty<=p.min?'<span class="red">'+p.qty+' LOW</span>':p.qty,money(p.cost),money(p.price),esc(p.supplier||'—')+'<br>'+esc((p.serial||[]).join(', ')||'—'),'<button class="danger" data-delete="'+p.id+'">Delete</button>'])));
+
 const productOptions=db.products.map(p=>({id:p.id,label:p.name+' (Stock '+p.qty+')'}));
 setOptions('purchaseProduct',productOptions,'Product चुनें');
 setOptions('saleProduct',productOptions,'Product चुनें');
+
 const customerOptions=db.customers.map(c=>({id:c.id,label:c.name}));
 setOptions('saleCustomer',customerOptions,'Walk-in customer');
 setOptions('paymentCustomer',customerOptions,'Customer चुनें');
+
 $('purchaseHistory').innerHTML=table(['Date','Product','Qty','Total','Supplier / Note'],db.purchases.slice().reverse().map(p=>row([esc(p.date),esc(prod(p.productId)?.name||'Deleted product'),p.qty,money(p.total),esc(p.supplier||p.note||'—')])));
+
 $('salesHistory').innerHTML=table(['Date','Product','Qty','Total','Customer','Due'],db.sales.slice().reverse().map(s=>row([esc(s.date),esc(prod(s.productId)?.name||'Deleted product'),s.qty,money(s.total),esc(cust(s.customerId)?.name||'Walk-in'),money(s.total-s.paid)])));
+
 $('installHistory').innerHTML=table(['Date','Site','Cameras','Charge','Paid','Status'],db.installations.slice().reverse().map(i=>row([esc(i.date),esc(i.customer)+'<br>'+esc(i.address),i.qty,money(i.amount),money(i.paid),esc(i.status)])));
+
 $('customerList').innerHTML=table(['Customer','Mobile','Due','Address'],db.customers.map(c=>row([esc(c.name),esc(c.phone||'—'),'<b class="'+(due(c)>0?'red':'green')+'">'+money(due(c))+'</b>',esc(c.address||'—')])));
+
 $('expenseHistory').innerHTML=table(['Date','Expense','Category','Amount','Note'],db.expenses.slice().reverse().map(e=>row([esc(e.date),esc(e.title),esc(e.category),money(e.amount),esc(e.note||'—')])));
+
 const totalPurchase=db.purchases.reduce((a,p)=>a+p.total,0);
 const totalExpense=db.expenses.reduce((a,e)=>a+e.amount,0);
 const installTotal=db.installations.reduce((a,i)=>a+i.amount,0);
+
 $('reportStats').innerHTML=[['Sales',money(salesTotal)],['Purchases',money(totalPurchase)],['Expenses',money(totalExpense)],['Customer due',money(dueTotal)]].map(x=>'<div class="card"><small>'+x[0]+'</small><strong>'+x[1]+'</strong></div>').join('');
-$('reportDetails').innerHTML=table(['Report','Amount'],[row(['Installation charges',money(installTotal)]),row(['Sales received',money(db.sales.reduce((a,s)=>a+s.paid,0))]),row(['Estimated gross margin',money(db.sales.reduce((a,s)=>a+s.total-(prod(s.productId)?.cost||0)*s.qty,0))]),row(['After recorded expenses (estimate)',money(db.sales.reduce((a,s)=>a+s.total-(prod(s.productId)?.cost||0)*s.qty,0)-totalExpense])]);
+
+const grossMargin=db.sales.reduce((a,s)=>a+s.total-(prod(s.productId)?.cost||0)*s.qty,0);
+$('reportDetails').innerHTML=table(['Report','Amount'],[
+row(['Installation charges',money(installTotal)]),
+row(['Sales received',money(db.sales.reduce((a,s)=>a+s.paid,0))]),
+row(['Estimated gross margin',money(grossMargin)]),
+row(['After recorded expenses (estimate)',money(grossMargin-totalExpense)])
+]);
 }
-document.querySelectorAll('[data-page]').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('[data-page]').forEach(x=>x.classList.remove('active'));document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));b.classList.add('active');$(b.dataset.page).classList.add('active')}));
-$('stockForm').addEventListener('submit',e=>{e.preventDefault();const f=e.target;db.products.push({id:uid(),name:val(f,'name'),category:val(f,'category'),model:val(f,'model'),qty:num(f,'qty'),min:num(f,'min'),cost:num(f,'cost'),price:num(f,'price'),supplier:val(f,'supplier'),serial:val(f,'serial').split(',').map(x=>x.trim()).filter(Boolean)});f.reset();save();alert('Stock सेव हो गया।')});
-$('purchaseForm').addEventListener('submit',e=>{e.preventDefault();const f=e.target,p=prod(val(f,'product')),qty=num(f,'qty'),cost=num(f,'cost');if(!p)return alert('Product चुनें।');p.qty+=qty;p.cost=cost;if(val(f,'supplier'))p.supplier=val(f,'supplier');db.purchases.push({id:uid(),date:today(),productId:p.id,qty,cost,total:qty*cost,supplier:val(f,'supplier'),note:val(f,'note')});f.reset();save();alert('Purchase सेव हो गई।')});
-$('saleForm').addEventListener('submit',e=>{e.preventDefault();const f=e.target,p=prod(val(f,'product')),qty=num(f,'qty'),price=num(f,'price'),paid=num(f,'paid');if(!p)return alert('Product चुनें।');if(qty>p.qty)return alert('इतना स्टॉक उपलब्ध नहीं है।');const total=qty*price;if(paid>total)return alert('Received amount total से ज्यादा है।');p.qty-=qty;db.sales.push({id:uid(),date:today(),productId:p.id,qty,price,total,paid,customerId:val(f,'customer'),note:val(f,'note')});f.reset();save();alert('Sale सेव हो गई।')});
-$('installForm').addEventListener('submit',e=>{e.preventDefault();const f=e.target;db.installations.push({id:uid(),date:today(),customer:val(f,'customer'),qty:num(f,'qty'),amount:num(f,'amount'),paid:num(f,'paid'),address:val(f,'address'),status:val(f,'status'),note:val(f,'note')});f.reset();save();alert('Installation सेव हो गई।')});
-$('customerForm').addEventListener('submit',e=>{e.preventDefault();const f=e.target;db.customers.push({id:uid(),name:val(f,'name'),phone:val(f,'phone'),openingDue:num(f,'due'),address:val(f,'address')});f.reset();save();alert('Customer सेव हो गया।')});
-$('paymentForm').addEventListener('submit',e=>{e.preventDefault();const f=e.target;db.payments.push({id:uid(),date:today(),customerId:val(f,'customer'),amount:num(f,'amount'),note:val(f,'note')});f.reset();save();alert('Payment सेव हो गई।')});
-$('expenseForm').addEventListener('submit',e=>{e.preventDefault();const f=e.target;db.expenses.push({id:uid(),date:today(),title:val(f,'title'),amount:num(f,'amount'),category:val(f,'category'),note:val(f,'note')});f.reset();save();alert('Expense सेव हो गया।')});
+  
+document.querySelectorAll('[data-page]').forEach(b=>b.addEventListener('click',()=>{
+  document.querySelectorAll('[data-page]').forEach(x=>x.classList.remove('active'));
+  document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));
+  b.classList.add('active');
+  $(b.dataset.page).classList.add('active');
+}));
+
+$('stockForm').addEventListener('submit',e=>{
+  e.preventDefault();
+  const f=e.target;
+  db.products.push({
+    id:uid(),name:val(f,'name'),category:val(f,'category'),
+    model:val(f,'model'),qty:num(f,'qty'),min:num(f,'min'),
+    cost:num(f,'cost'),price:num(f,'price'),supplier:val(f,'supplier'),
+    serial:val(f,'serial').split(',').map(x=>x.trim()).filter(Boolean)
+  });
+  f.reset();save();alert('Stock सेव हो गया।');
+});
+
+$('purchaseForm').addEventListener('submit',e=>{
+  e.preventDefault();
+  const f=e.target,p=prod(val(f,'product')),qty=num(f,'qty'),cost=num(f,'cost');
+  if(!p)return alert('Product चुनें।');
+  p.qty+=qty;p.cost=cost;
+  if(val(f,'supplier'))p.supplier=val(f,'supplier');
+  db.purchases.push({
+    id:uid(),date:today(),productId:p.id,qty,cost,total:qty*cost,
+    supplier:val(f,'supplier'),note:val(f,'note')
+  });
+  f.reset();save();alert('Purchase सेव हो गई।');
+});
+
+$('saleForm').addEventListener('submit',e=>{
+  e.preventDefault();
+  const f=e.target,p=prod(val(f,'product')),qty=num(f,'qty'),
+    price=num(f,'price'),paid=num(f,'paid');
+  if(!p)return alert('Product चुनें।');
+  if(qty>p.qty)return alert('इतना स्टॉक उपलब्ध नहीं है।');
+  const total=qty*price;
+  if(paid>total)return alert('Received amount total से ज्यादा है।');
+  p.qty-=qty;
+  db.sales.push({
+    id:uid(),date:today(),productId:p.id,qty,price,total,paid,
+    customerId:val(f,'customer'),note:val(f,'note')
+  });
+  f.reset();save();alert('Sale सेव हो गई।');
+});
+
+$('installForm').addEventListener('submit',e=>{
+  e.preventDefault();
+  const f=e.target;
+  db.installations.push({
+    id:uid(),date:today(),customer:val(f,'customer'),qty:num(f,'qty'),
+    amount:num(f,'amount'),paid:num(f,'paid'),address:val(f,'address'),
+    status:val(f,'status'),note:val(f,'note')
+  });
+  f.reset();save();alert('Installation सेव हो गई।');
+});
+
+$('customerForm').addEventListener('submit',e=>{
+  e.preventDefault();
+  const f=e.target;
+  db.customers.push({
+    id:uid(),name:val(f,'name'),phone:val(f,'phone'),
+    openingDue:num(f,'due'),address:val(f,'address')
+  });
+  f.reset();save();alert('Customer सेव हो गया।');
+});
+
+$('paymentForm').addEventListener('submit',e=>{
+  e.preventDefault();
+  const f=e.target;
+  db.payments.push({
+    id:uid(),date:today(),customerId:val(f,'customer'),
+    amount:num(f,'amount'),note:val(f,'note')
+  });
+  f.reset();save();alert('Payment सेव हो गई।');
+});
+
+$('expenseForm').addEventListener('submit',e=>{
+  e.preventDefault();
+  const f=e.target;
+  db.expenses.push({
+    id:uid(),date:today(),title:val(f,'title'),amount:num(f,'amount'),
+    category:val(f,'category'),note:val(f,'note')
+  });
+  f.reset();save();alert('Expense सेव हो गया।');
+});
+
 $('searchStock').addEventListener('input',render);
-document.addEventListener('click',e=>{const id=e.target.dataset.delete;if(id&&confirm('यह product हटाएँ?')){db.products=db.products.filter(p=>p.id!==id);save()}});
-function download(name,content,type){const a=document.createElement('a'),url=URL.createObjectURL(new Blob([content],{type}));a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000)}
-$('backupBtn').onclick=()=>download('secure-track-backup.json',JSON.stringify(db,null,2),'application/json');
-$('csvBtn').onclick=()=>{const rows=[['Type','Date','Product / Description','Quantity','Amount','Paid','Note']];db.purchases.forEach(x=>rows.push(['Purchase',x.date,prod(x.productId)?.name||'',x.qty,x.total,'',x.note||x.supplier||'']));db.sales.forEach(x=>rows.push(['Sale',x.date,prod(x.productId)?.name||'',x.qty,x.total,x.paid,x.note||'']));db.expenses.forEach(x=>rows.push(['Expense',x.date,x.title,'',x.amount,'',x.note||'']));download('secure-track-transactions.csv',rows.map(r=>r.map(v=>'"'+String(v??'').replace(/"/g,'""')+'"').join(',')).join('\n'),'text/csv')};
-$('restoreFile').addEventListener('change',async e=>{const file=e.target.files[0];if(!file)return;try{const data=JSON.parse(await file.text());if(!Array.isArray(data.products)||!Array.isArray(data.customers))throw Error();if(confirm('वर्तमान डेटा replace होगा। जारी रखें?')){db={...emptyDB(),...data};save();$('backupMsg').textContent='Backup restore हो गया।'}}catch(err){alert('Backup file सही नहीं है।')}e.target.value=''});
-$('clearBtn').onclick=()=>{if(confirm('सारा डेटा delete होगा। क्या आपने backup लिया है?')&&confirm('पक्का delete करें?')){db=emptyDB();save();$('backupMsg').textContent='सारा डेटा हटाया गया।'}};
+
+document.addEventListener('click',e=>{
+  const id=e.target.dataset.delete;
+  if(id&&confirm('यह product हटाएँ?')){
+    db.products=db.products.filter(p=>p.id!==id);
+    save();
+  }
+});
+
+function download(name,content,type){
+  const a=document.createElement('a');
+  const url=URL.createObjectURL(new Blob([content],{type}));
+  a.href=url;a.download=name;a.click();
+  setTimeout(()=>URL.revokeObjectURL(url),1000);
+}
+
+$('backupBtn').onclick=()=>download(
+  'secure-track-backup.json',JSON.stringify(db,null,2),'application/json'
+);
+
+$('csvBtn').onclick=()=>{
+  const rows=[['Type','Date','Product / Description','Quantity','Amount','Paid','Note']];
+  db.purchases.forEach(x=>rows.push([
+    'Purchase',x.date,prod(x.productId)?.name||'',x.qty,x.total,'',x.note||x.supplier||''
+  ]));
+  db.sales.forEach(x=>rows.push([
+    'Sale',x.date,prod(x.productId)?.name||'',x.qty,x.total,x.paid,x.note||''
+  ]));
+  db.expenses.forEach(x=>rows.push([
+    'Expense',x.date,x.title,'',x.amount,'',x.note||''
+  ]));
+  download(
+    'secure-track-transactions.csv',
+    rows.map(r=>r.map(v=>'"'+String(v??'').replace(/"/g,'""')+'"').join(',')).join('\n'),
+    'text/csv'
+  );
+};
+
+$('restoreFile').addEventListener('change',async e=>{
+  const file=e.target.files[0];
+  if(!file)return;
+  try{
+    const data=JSON.parse(await file.text());
+    if(!Array.isArray(data.products)||!Array.isArray(data.customers))throw Error();
+    if(confirm('वर्तमान डेटा replace होगा। जारी रखें?')){
+      db={...emptyDB(),...data};
+      save();
+      $('backupMsg').textContent='Backup restore हो गया।';
+    }
+  }catch(err){
+    alert('Backup file सही नहीं है।');
+  }
+  e.target.value='';
+});
+
+$('clearBtn').onclick=()=>{
+  if(confirm('सारा डेटा delete होगा। क्या आपने backup लिया है?')&&confirm('पक्का delete करें?')){
+    db=emptyDB();
+    save();
+    $('backupMsg').textContent='सारा डेटा हटाया गया।';
+  }
+};
+
 render();
 </script>
 </body>
