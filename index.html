@@ -539,6 +539,38 @@ function addSerial(){
  $('scanSerial').value='';renderScans();$('scanSerial').focus();
 }
 $('addSerial').onclick=addSerial;
+  
+let scanningActive = false;
+let scanDebounce = null;
+
+$('startScan').onclick = () => {
+  scanningActive = !scanningActive;
+  $('startScan').textContent = scanningActive
+    ? 'Stop Scanning'
+    : 'Start Scanning';
+
+  if (scanningActive) $('scanSerial').focus();
+  else clearTimeout(scanDebounce);
+};
+
+$('scanSerial').addEventListener('keydown', e => {
+  if (e.key === 'Enter') {
+    e.preventDefault();
+    if (scanningActive) addSerial();
+  }
+});
+
+$('scanSerial').addEventListener('input', () => {
+  if (!scanningActive) return;
+
+  clearTimeout(scanDebounce);
+  scanDebounce = setTimeout(() => {
+    if (scanningActive && $('scanSerial').value.trim()) {
+      addSerial();
+    }
+  }, 450);
+});
+  
 $('scanSerial').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();addSerial()}});
 $('scanList').addEventListener('click',e=>{const b=e.target.closest('[data-remove-scan]');if(b){pendingSerials.splice(Number(b.dataset.removeScan),1);renderScans()}});
 $('clearScans').onclick=()=>{pendingSerials=[];renderScans()};
