@@ -4,257 +4,222 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Secure Track Security | CCTV Stock</title>
+<meta name="theme-color" content="#101b35">
+<title>Secure Track Security | CCTV Manager</title>
 <style>
-:root{--bg:#0b1220;--panel:#131e30;--line:#29374c;--text:#eaf1fb;--muted:#91a2bb;--blue:#3b82f6;--green:#22c55e;--red:#ef4444}
+:root{--bg:#0b1220;--panel:#14213a;--line:#2b3c5a;--text:#f1f5ff;--muted:#aab8d0;--blue:#367dff;--green:#22c58b;--red:#ff6478;--yellow:#ffd166}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--text);font:15px Arial,sans-serif}
-header{padding:20px 16px;background:#101b2c;border-bottom:1px solid var(--line)}
-header h2{margin:0 0 7px;font-size:21px}
+header{background:#101b35;padding:17px;position:sticky;top:0;z-index:5;border-bottom:1px solid var(--line)}
+header h2{margin:0 0 5px;font-size:20px}
 header p{margin:0;color:var(--muted);font-size:13px}
-main{max-width:1100px;margin:auto;padding:15px}
-nav{display:flex;gap:8px;overflow:auto;padding:12px 0}
-button,.tab{border:0;border-radius:8px;padding:11px 13px;background:#26364d;color:white;cursor:pointer;font-weight:600}
-button.primary{background:var(--blue)}
-button.green{background:#168348}
-button.red{background:#a92e39}
-nav button.active{background:var(--blue)}
+main{max-width:1100px;margin:auto;padding:12px}
+nav{display:flex;gap:7px;overflow-x:auto;padding:5px 0 14px}
+button,.btn{background:#203454;color:white;border:1px solid var(--line);padding:11px 13px;border-radius:9px;font-size:14px;cursor:pointer;white-space:nowrap}
+button.active,button.primary{background:var(--blue);border-color:var(--blue)}
+button.danger{background:#512536}
 .page{display:none}.page.active{display:block}
-.cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:10px 0 16px}
-.card,.panel{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:15px;margin-bottom:14px}
-.card small,.muted{color:var(--muted)}
-.card strong{display:block;font-size:24px;margin-top:10px;overflow-wrap:anywhere}
-h3{margin:0 0 14px;font-size:17px}
-label{display:block;font-size:13px;color:#b8c6d9;margin:11px 0 6px}
-input,select{width:100%;padding:12px;background:#0b1525;border:1px solid #34445b;border-radius:8px;color:white;font-size:15px}
-.formgrid{display:grid;grid-template-columns:1fr;gap:4px}
-.actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
-.tablewrap{overflow:auto}
-table{width:100%;border-collapse:collapse;min-width:520px;font-size:13px}
-th,td{text-align:left;padding:11px 9px;border-bottom:1px solid var(--line)}
-th{color:#9eb1cb}
-.good{color:#4ade80}.bad{color:#f87171}
-#chart{width:100%;height:170px;display:block}
-.notice{font-size:12px;line-height:1.6;color:var(--muted)}
-@media(min-width:650px){.cards{grid-template-columns:repeat(4,minmax(0,1fr))}.formgrid{grid-template-columns:1fr 1fr}.formgrid .full{grid-column:1/-1}}
+.cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin-bottom:12px}
+.card,.panel{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:13px;margin-bottom:12px;min-width:0}
+.card small{color:var(--muted)}.card strong{display:block;font-size:21px;margin-top:7px;overflow-wrap:anywhere}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+h3{font-size:17px;margin:0 0 13px}
+.field{margin-bottom:11px}
+label{display:block;font-size:13px;color:var(--muted);margin-bottom:5px}
+input,select,textarea{width:100%;padding:11px;border-radius:8px;border:1px solid var(--line);background:#0b162a;color:white;font-size:15px}
+textarea{min-height:65px}
+.actions{display:flex;gap:8px;flex-wrap:wrap}
+.tablebox{overflow-x:auto}
+table{border-collapse:collapse;width:100%;min-width:540px}
+td,th{text-align:left;padding:10px;border-bottom:1px solid var(--line);font-size:13px}
+th{color:var(--muted)}
+.muted{color:var(--muted)}.green{color:var(--green)}.red{color:var(--red)}
+.notice{background:#30291a;border:1px solid #705a29;color:#ffe3a1;padding:11px;border-radius:9px;font-size:13px;margin-bottom:12px}
+.empty{padding:12px;color:var(--muted)}
+footer{text-align:center;color:var(--muted);font-size:12px;padding:20px}
+@media(min-width:700px){.cards{grid-template-columns:repeat(4,minmax(0,1fr))}}
 </style>
 </head>
 <body>
 <header>
-  <h2>🛡️ SECURE TRACK SECURITY</h2>
-  <p>CCTV STOCK MANAGEMENT TERMINAL · INDORE</p>
+<h2>🔐 Secure Track Security</h2>
+<p>CCTV Stock · Sales · Installation · Accounts</p>
 </header>
 <main>
-<nav>
-  <button class="active" data-page="dashboard">Dashboard</button>
-  <button data-page="stock">Stock Entry</button>
-  <button data-page="sale">Sale</button>
-  <button data-page="inventory">Inventory</button>
-  <button data-page="history">History</button>
-  <button data-page="backup">Backup</button>
+<div class="notice">यह संस्करण डेटा इसी ब्राउज़र में सेव करता है। नियमित Backup डाउनलोड करें। मोबाइल और लैपटॉप में एक ही डेटा देखने के लिए बाद में Cloud Database जोड़ना होगा।</div>
+<nav id="nav">
+<button class="active" data-page="dashboard">Dashboard</button>
+<button data-page="stock">Stock</button>
+<button data-page="purchase">Purchase</button>
+<button data-page="sales">Sales</button>
+<button data-page="install">Installation</button>
+<button data-page="customers">Customers</button>
+<button data-page="expenses">Expenses</button>
+<button data-page="reports">Reports</button>
+<button data-page="backup">Backup</button>
 </nav>
 
 <section id="dashboard" class="page active">
-  <div class="cards">
-    <div class="card"><small>Total In-Stock Cameras</small><strong id="kStock">0</strong></div>
-    <div class="card"><small>Models</small><strong id="kModels">0</strong></div>
-    <div class="card"><small>Total Sales</small><strong id="kSales">₹0</strong></div>
-    <div class="card"><small>Gross Profit</small><strong id="kProfit" class="good">₹0</strong></div>
-  </div>
-  <div class="panel">
-    <h3>Recent 7-Day Sales</h3>
-    <svg id="chart" viewBox="0 0 600 170" preserveAspectRatio="none"></svg>
-    <p class="notice">चार्ट आपकी दर्ज की गई बिक्री पर आधारित है।</p>
-  </div>
-  <div class="panel">
-    <h3>Quick Actions</h3>
-    <div class="actions">
-      <button class="primary" onclick="showPage('stock')">+ Add Camera Stock</button>
-      <button class="green" onclick="showPage('sale')">Record Sale</button>
-      <button onclick="showPage('backup')">Backup Data</button>
-    </div>
-  </div>
+<div class="cards" id="stats"></div>
+<div class="panel"><h3>⚠️ Low Stock Alert</h3><div id="lowStock"></div></div>
+<div class="panel"><h3>Recent Transactions</h3><div id="recent"></div></div>
 </section>
 
 <section id="stock" class="page">
-  <div class="panel">
-    <h3>Purchase / Camera Stock Entry</h3>
-    <form id="stockForm">
-      <div class="formgrid">
-        <div><label>Brand</label><input id="brand" value="CP Plus" required></div>
-        <div><label>Camera Model</label><input id="model" placeholder="जैसे CP-UNC-..." required></div>
-        <div class="full"><label>Unique Serial Number / Barcode</label><input id="serial" placeholder="Barcode scan करें या serial लिखें" required autocomplete="off"></div>
-        <div><label>Purchase Cost (₹)</label><input id="cost" type="number" min="0" step=".01" required></div>
-        <div><label>Expected Sale Price (₹)</label><input id="price" type="number" min="0" step=".01" required></div>
-      </div>
-      <div class="actions"><button class="primary" type="submit">Save Camera</button></div>
-    </form>
-    <p class="notice">एक कैमरा = एक unique serial number। USB barcode scanner को input में क्लिक करके scan करें। अगर scanner Enter भेजता है, तो फॉर्म सबमिट हो सकता है।</p>
-  </div>
+<div class="grid">
+<div class="panel"><h3>Add New Stock</h3>
+<form id="stockForm">
+<div class="field"><label>Product Name *</label><input name="name" required placeholder="CP Plus 2MP Camera"></div>
+<div class="grid">
+<div class="field"><label>Category</label><select name="category"><option>CCTV Camera</option><option>DVR / NVR</option><option>Hard Disk</option><option>PoE Switch</option><option>Cable</option><option>Power Supply</option><option>Accessories</option><option>Other</option></select></div>
+<div class="field"><label>Brand / Model</label><input name="model" placeholder="CP Plus"></div>
+</div>
+<div class="grid">
+<div class="field"><label>Quantity *</label><input name="qty" type="number" min="1" value="1" required></div>
+<div class="field"><label>Low-stock alert at</label><input name="min" type="number" min="0" value="2"></div>
+</div>
+<div class="grid">
+<div class="field"><label>Purchase price / unit ₹</label><input name="cost" type="number" min="0" step=".01" value="0"></div>
+<div class="field"><label>Sale price / unit ₹</label><input name="price" type="number" min="0" step=".01" value="0"></div>
+</div>
+<div class="field"><label>Supplier</label><input name="supplier"></div>
+<div class="field"><label>Serial numbers (optional, comma separated)</label><input name="serial" placeholder="SN001, SN002"></div>
+<button class="primary">Save Stock</button>
+</form></div>
+<div class="panel"><h3>Inventory</h3><input id="searchStock" placeholder="Search product..." style="margin-bottom:10px"><div id="inventory" class="tablebox"></div></div>
+</div>
 </section>
 
-<section id="sale" class="page">
-  <div class="panel">
-    <h3>Sell / Dispatch Camera</h3>
-    <form id="saleForm">
-      <label>Camera Serial Number / Barcode</label>
-      <input id="saleSerial" placeholder="Serial scan करें" required autocomplete="off">
-      <label>Customer Name (optional)</label>
-      <input id="customer" placeholder="Customer name">
-      <label>Actual Sale Price (₹)</label>
-      <input id="salePrice" type="number" min="0" step=".01" required>
-      <div class="actions"><button class="green" type="submit">Confirm Sale</button></div>
-    </form>
-    <p class="notice">बिक्री के बाद कैमरा स्टॉक से हटेगा और gross profit रिकॉर्ड होगा।</p>
-  </div>
-</section>
+<section id="purchase" class="page">
+<div class="grid">
+<div class="panel"><h3>Record Purchase</h3><form id="purchaseForm">
+<div class="field"><label>Product *</label><select name="product" id="purchaseProduct" required></select></div>
+<div class="grid"><div class="field"><label>Quantity</label><input name="qty" type="number" min="1" value="1" required></div><div class="field"><label>Unit cost ₹</label><input name="cost" type="number" min="0" step=".01" required></div></div>
+<div class="field"><label>Supplier</label><input name="supplier"></div><div class="field"><label>Invoice / Note</label><input name="note"></div>
+<button class="primary">Save Purchase</button></form></div>
+<div class="panel"><h3>Purchase History</h3><div id="purchaseHistory" class="tablebox"></div></div>
+</div></section>
 
-<section id="inventory" class="page">
-  <div class="panel">
-    <h3>Camera Inventory</h3>
-    <input id="filter" placeholder="Model, brand या serial से खोजें">
-    <div class="tablewrap"><table><thead><tr><th>Brand / Model</th><th>Serial</th><th>Cost</th><th>Sale Price</th><th>Status</th></tr></thead><tbody id="stockRows"></tbody></table></div>
-  </div>
-  <div class="panel">
-    <h3>Model-wise Stock Summary</h3>
-    <div class="tablewrap"><table><thead><tr><th>Brand / Model</th><th>In Stock</th><th>Sold</th></tr></thead><tbody id="modelRows"></tbody></table></div>
-  </div>
-</section>
+<section id="sales" class="page">
+<div class="grid">
+<div class="panel"><h3>Record Sale</h3><form id="saleForm">
+<div class="field"><label>Product *</label><select name="product" id="saleProduct" required></select></div>
+<div class="grid"><div class="field"><label>Quantity</label><input name="qty" type="number" min="1" value="1" required></div><div class="field"><label>Sale price / unit ₹</label><input name="price" type="number" min="0" step=".01" required></div></div>
+<div class="field"><label>Customer</label><select name="customer" id="saleCustomer"></select></div>
+<div class="field"><label>Amount received ₹</label><input name="paid" type="number" min="0" step=".01" value="0"></div>
+<div class="field"><label>Invoice / Note</label><input name="note"></div>
+<button class="primary">Save Sale</button></form></div>
+<div class="panel"><h3>Sales History</h3><div id="salesHistory" class="tablebox"></div></div>
+</div></section>
 
-<section id="history" class="page">
-  <div class="panel">
-    <h3>Purchase & Sales History</h3>
-    <div class="tablewrap"><table><thead><tr><th>Date</th><th>Type</th><th>Model / Serial</th><th>Amount</th><th>Profit</th></tr></thead><tbody id="historyRows"></tbody></table></div>
-  </div>
-</section>
+<section id="install" class="page">
+<div class="grid">
+<div class="panel"><h3>Installation Job</h3><form id="installForm">
+<div class="field"><label>Customer / Site *</label><input name="customer" required></div>
+<div class="grid"><div class="field"><label>Camera quantity</label><input name="qty" type="number" min="0" value="1"></div><div class="field"><label>Installation charge ₹</label><input name="amount" type="number" min="0" step=".01" value="0"></div></div>
+<div class="field"><label>Address</label><textarea name="address"></textarea></div>
+<div class="grid"><div class="field"><label>Paid ₹</label><input name="paid" type="number" min="0" step=".01" value="0"></div><div class="field"><label>Status</label><select name="status"><option>Pending</option><option>Scheduled</option><option>Completed</option></select></div></div>
+<div class="field"><label>Notes</label><input name="note"></div><button class="primary">Save Installation</button>
+</form></div>
+<div class="panel"><h3>Installation Records</h3><div id="installHistory" class="tablebox"></div></div>
+</div></section>
 
-<section id="backup" class="page">
-  <div class="panel">
-    <h3>Backup & Recovery</h3>
-    <p class="notice">Backup file को मोबाइल से अलग सुरक्षित जगह पर रखें। दूसरे मोबाइल/कंप्यूटर पर डेटा ले जाने के लिए JSON backup इस्तेमाल करें।</p>
-    <div class="actions">
-      <button class="primary" onclick="exportBackup()">Download Backup</button>
-      <button onclick="document.getElementById('restoreFile').click()">Restore Backup</button>
-      <button onclick="exportCSV()">Export Inventory CSV</button>
-      <input id="restoreFile" type="file" accept=".json,application/json" hidden>
-    </div>
-    <p class="notice">महत्वपूर्ण: GitHub Pages पर यह शुरुआती वर्जन डेटा इसी ब्राउज़र के local storage में रखता है। यह अपने-आप cloud sync नहीं करता। ब्राउज़र का data clear करने से पहले backup जरूर लें।</p>
-    <p id="backupStatus" class="notice"></p>
-  </div>
-</section>
+<section id="customers" class="page">
+<div class="grid">
+<div class="panel"><h3>Add Customer</h3><form id="customerForm">
+<div class="field"><label>Name *</label><input name="name" required></div>
+<div class="field"><label>Mobile</label><input name="phone" inputmode="tel"></div>
+<div class="field"><label>Opening due ₹</label><input name="due" type="number" min="0" step=".01" value="0"></div>
+<div class="field"><label>Address</label><textarea name="address"></textarea></div><button class="primary">Save Customer</button>
+</form></div>
+<div class="panel"><h3>Customer Ledger / Due</h3><div id="customerList" class="tablebox"></div>
+<form id="paymentForm" style="margin-top:18px"><h3>Receive Payment</h3>
+<div class="field"><label>Customer</label><select name="customer" id="paymentCustomer" required></select></div>
+<div class="field"><label>Amount received ₹</label><input name="amount" type="number" min=".01" step=".01" required></div>
+<div class="field"><label>Note</label><input name="note"></div><button class="primary">Record Payment</button>
+</form></div>
+</div></section>
+
+<section id="expenses" class="page">
+<div class="grid">
+<div class="panel"><h3>Add Expense</h3><form id="expenseForm">
+<div class="field"><label>Expense title *</label><input name="title" required placeholder="Petrol, labour, travel"></div>
+<div class="grid"><div class="field"><label>Amount ₹ *</label><input name="amount" type="number" min=".01" step=".01" required></div><div class="field"><label>Category</label><select name="category"><option>Travel</option><option>Labour</option><option>Office</option><option>Tools</option><option>Other</option></select></div></div>
+<div class="field"><label>Note</label><input name="note"></div><button class="primary">Save Expense</button>
+</form></div>
+<div class="panel"><h3>Expense History</h3><div id="expenseHistory" class="tablebox"></div></div>
+</div></section>
+
+<section id="reports" class="page"><div class="panel"><h3>Business Reports</h3><div class="cards" id="reportStats"></div><div id="reportDetails"></div></div></section>
+<section id="backup" class="page"><div class="panel"><h3>Backup & Restore</h3><p class="muted">Restore करने पर मौजूदा डेटा replace होगा। पहले backup डाउनलोड करें।</p><div class="actions"><button class="primary" id="backupBtn">Download JSON Backup</button><label class="btn">Restore Backup <input type="file" id="restoreFile" accept=".json,application/json" hidden></label><button id="csvBtn">Export CSV</button><button class="danger" id="clearBtn">Delete All Data</button></div><p id="backupMsg" class="muted"></p></div></section>
+<footer>Secure Track Security · Indore · CCTV Sales & Installation</footer>
 </main>
+<!-- Part 2 yahin se shuru hoga -->
+  
 <script>
-const KEY="secure_track_cctv_stock_v1";
-let db={cameras:[],transactions:[]};
-
-function loadDB(){
-  try{
-    const saved=localStorage.getItem(KEY);
-    if(saved){const d=JSON.parse(saved);if(d&&Array.isArray(d.cameras)&&Array.isArray(d.transactions))db=d;}
-  }catch(e){alert("Saved data पढ़ने में समस्या हुई। Backup file हो तो Restore करें।");}
-}
-function saveDB(){localStorage.setItem(KEY,JSON.stringify(db));render();}
-function money(n){return "₹"+Number(n||0).toLocaleString("en-IN",{maximumFractionDigits:2});}
-function dateText(d){return new Date(d).toLocaleString("en-IN");}
-function showPage(id){
-  document.querySelectorAll(".page").forEach(x=>x.classList.toggle("active",x.id===id));
-  document.querySelectorAll("nav button").forEach(x=>x.classList.toggle("active",x.dataset.page===id));
-  if(id==="stock")setTimeout(()=>document.getElementById("serial").focus(),80);
-  if(id==="sale")setTimeout(()=>document.getElementById("saleSerial").focus(),80);
-  render();
-}
-document.querySelectorAll("nav button").forEach(b=>b.addEventListener("click",()=>showPage(b.dataset.page)));
-
-document.getElementById("stockForm").addEventListener("submit",e=>{
-  e.preventDefault();
-  const serial=document.getElementById("serial").value.trim();
-  if(db.cameras.some(c=>c.serial.toLowerCase()===serial.toLowerCase()))return alert("यह Serial Number पहले से मौजूद है!");
-  const c={
-    id:crypto.randomUUID?crypto.randomUUID():String(Date.now()),
-    brand:document.getElementById("brand").value.trim(),
-    model:document.getElementById("model").value.trim(),
-    serial,cost:Number(document.getElementById("cost").value),
-    price:Number(document.getElementById("price").value),
-    status:"In Stock",customer:"",added:new Date().toISOString(),soldAt:"",salePrice:0
-  };
-  db.cameras.push(c);
-  db.transactions.push({date:c.added,type:"Purchase",model:c.brand+" "+c.model,serial:c.serial,amount:c.cost,profit:0});
-  saveDB();e.target.reset();document.getElementById("brand").value="CP Plus";
-  alert("Camera stock save हो गया।");
-});
-
-document.getElementById("saleForm").addEventListener("submit",e=>{
-  e.preventDefault();
-  const serial=document.getElementById("saleSerial").value.trim();
-  const c=db.cameras.find(x=>x.serial.toLowerCase()===serial.toLowerCase());
-  if(!c)return alert("Serial Number नहीं मिला। पहले stock entry करें।");
-  if(c.status!=="In Stock")return alert("यह कैमरा पहले ही sold हो चुका है।");
-  const amount=Number(document.getElementById("salePrice").value);
-  if(amount<0)return alert("Sale price गलत है।");
-  c.status="Sold";c.customer=document.getElementById("customer").value.trim();
-  c.salePrice=amount;c.soldAt=new Date().toISOString();
-  db.transactions.push({date:c.soldAt,type:"Sale",model:c.brand+" "+c.model,serial:c.serial,amount,profit:amount-c.cost});
-  saveDB();e.target.reset();alert("Sale save हो गई।");
-});
-
-document.getElementById("filter").addEventListener("input",render);
+const KEY='secure_track_business_manager_v2';
+const emptyDB=()=>({products:[],customers:[],purchases:[],sales:[],installations:[],expenses:[],payments:[]});
+let db;
+try{db={...emptyDB(),...JSON.parse(localStorage.getItem(KEY)||'{}')}}catch(e){db=emptyDB()}
+const $=id=>document.getElementById(id);
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,7);
+const val=(f,n)=>f.elements[n]?.value?.trim()||'';
+const num=(f,n)=>Number(f.elements[n]?.value||0);
+const money=n=>'₹'+Number(n||0).toLocaleString('en-IN',{maximumFractionDigits:2});
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const today=()=>new Date().toLocaleString('en-IN');
+const prod=id=>db.products.find(p=>p.id===id);
+const cust=id=>db.customers.find(c=>c.id===id);
+function table(head,rows){if(!rows.length)return '<div class="empty">अभी कोई रिकॉर्ड नहीं है।</div>';return '<table><thead><tr>'+head.map(x=>'<th>'+x+'</th>').join('')+'</tr></thead><tbody>'+rows.join('')+'</tbody></table>'}
+function row(cells){return '<tr>'+cells.map(x=>'<td>'+x+'</td>').join('')+'</tr>'}
+function due(c){return Number(c.openingDue||0)+db.sales.filter(s=>s.customerId===c.id).reduce((a,s)=>a+s.total-s.paid,0)+db.installations.filter(i=>i.customer===c.name).reduce((a,i)=>a+i.amount-i.paid,0)-db.payments.filter(p=>p.customerId===c.id).reduce((a,p)=>a+p.amount,0)}
+function save(){localStorage.setItem(KEY,JSON.stringify(db));render()}
+function setOptions(id,items,placeholder){const el=$(id),old=el.value;el.innerHTML='<option value="">'+placeholder+'</option>'+items.map(i=>'<option value="'+esc(i.id)+'">'+esc(i.label)+'</option>').join('');if(items.some(i=>i.id===old))el.value=old}
 function render(){
-  const inStock=db.cameras.filter(c=>c.status==="In Stock");
-  const sold=db.cameras.filter(c=>c.status==="Sold");
-  const sales=sold.reduce((s,c)=>s+c.salePrice,0);
-  const profit=sold.reduce((s,c)=>s+c.salePrice-c.cost,0);
-  document.getElementById("kStock").textContent=inStock.length;
-  document.getElementById("kModels").textContent=new Set(db.cameras.map(c=>c.brand+" "+c.model)).size;
-  document.getElementById("kSales").textContent=money(sales);
-  document.getElementById("kProfit").textContent=money(profit);
-
-  const q=(document.getElementById("filter")?.value||"").toLowerCase();
-  document.getElementById("stockRows").innerHTML=db.cameras.filter(c=>(c.brand+" "+c.model+" "+c.serial).toLowerCase().includes(q)).slice().reverse().map(c=>
-    `<tr><td>${esc(c.brand)}<br>${esc(c.model)}</td><td>${esc(c.serial)}</td><td>${money(c.cost)}</td><td>${money(c.salePrice||c.price)}</td><td class="${c.status==="Sold"?"bad":"good"}">${c.status}</td></tr>`
-  ).join("")||'<tr><td colspan="5">अभी कोई कैमरा दर्ज नहीं है।</td></tr>';
-
-  const groups={};
-  db.cameras.forEach(c=>{const k=c.brand+" "+c.model;groups[k]??={stock:0,sold:0};groups[k][c.status==="Sold"?"sold":"stock"]++;});
-  document.getElementById("modelRows").innerHTML=Object.entries(groups).map(([k,v])=>`<tr><td>${esc(k)}</td><td>${v.stock}</td><td>${v.sold}</td></tr>`).join("")||'<tr><td colspan="3">अभी डेटा नहीं है।</td></tr>';
-
-  document.getElementById("historyRows").innerHTML=db.transactions.slice().reverse().map(t=>
-    `<tr><td>${dateText(t.date)}</td><td>${esc(t.type)}</td><td>${esc(t.model)}<br><span class="muted">${esc(t.serial)}</span></td><td>${money(t.amount)}</td><td class="${t.profit<0?"bad":"good"}">${money(t.profit)}</td></tr>`
-  ).join("")||'<tr><td colspan="5">अभी कोई transaction नहीं है।</td></tr>';
-  drawChart();
+const stockQty=db.products.reduce((a,p)=>a+p.qty,0);
+const stockValue=db.products.reduce((a,p)=>a+p.qty*p.cost,0);
+const salesTotal=db.sales.reduce((a,s)=>a+s.total,0);
+const dueTotal=db.customers.reduce((a,c)=>a+due(c),0);
+$('stats').innerHTML=[['Products',db.products.length],['Units in stock',stockQty],['Stock value',money(stockValue)],['Total sales',money(salesTotal)]].map(x=>'<div class="card"><small>'+x[0]+'</small><strong>'+x[1]+'</strong></div>').join('');
+const low=db.products.filter(p=>p.qty<=p.min);
+$('lowStock').innerHTML=low.length?low.map(p=>'<p class="red">⚠ '+esc(p.name)+' — '+p.qty+' बाकी</p>').join(''):'<p class="green">सभी प्रोडक्ट का स्टॉक ठीक है।</p>';
+const recent=[...db.sales.map(s=>({type:'Sale',date:s.date,name:prod(s.productId)?.name||'Product',amount:s.total})),...db.purchases.map(s=>({type:'Purchase',date:s.date,name:prod(s.productId)?.name||'Product',amount:s.total})),...db.expenses.map(s=>({type:'Expense',date:s.date,name:s.title,amount:s.amount}))].reverse().slice(0,7);
+$('recent').innerHTML=recent.length?recent.map(x=>'<p><b>'+x.type+': '+esc(x.name)+'</b><br><small class="muted">'+esc(x.date)+' · '+money(x.amount)+'</small></p>').join(''):'<div class="empty">अभी कोई ट्रांजैक्शन नहीं है।</div>';
+const search=($('searchStock').value||'').toLowerCase();
+$('inventory').innerHTML=table(['Product','Qty','Cost','Sale','Supplier / Serial','Action'],db.products.filter(p=>(p.name+' '+p.model+' '+p.supplier).toLowerCase().includes(search)).map(p=>row([esc(p.name)+'<br><small>'+esc(p.category+' '+(p.model||''))+'</small>',p.qty<=p.min?'<span class="red">'+p.qty+' LOW</span>':p.qty,money(p.cost),money(p.price),esc(p.supplier||'—')+'<br>'+esc((p.serial||[]).join(', ')||'—'),'<button class="danger" data-delete="'+p.id+'">Delete</button>'])));
+const productOptions=db.products.map(p=>({id:p.id,label:p.name+' (Stock '+p.qty+')'}));
+setOptions('purchaseProduct',productOptions,'Product चुनें');
+setOptions('saleProduct',productOptions,'Product चुनें');
+const customerOptions=db.customers.map(c=>({id:c.id,label:c.name}));
+setOptions('saleCustomer',customerOptions,'Walk-in customer');
+setOptions('paymentCustomer',customerOptions,'Customer चुनें');
+$('purchaseHistory').innerHTML=table(['Date','Product','Qty','Total','Supplier / Note'],db.purchases.slice().reverse().map(p=>row([esc(p.date),esc(prod(p.productId)?.name||'Deleted product'),p.qty,money(p.total),esc(p.supplier||p.note||'—')])));
+$('salesHistory').innerHTML=table(['Date','Product','Qty','Total','Customer','Due'],db.sales.slice().reverse().map(s=>row([esc(s.date),esc(prod(s.productId)?.name||'Deleted product'),s.qty,money(s.total),esc(cust(s.customerId)?.name||'Walk-in'),money(s.total-s.paid)])));
+$('installHistory').innerHTML=table(['Date','Site','Cameras','Charge','Paid','Status'],db.installations.slice().reverse().map(i=>row([esc(i.date),esc(i.customer)+'<br>'+esc(i.address),i.qty,money(i.amount),money(i.paid),esc(i.status)])));
+$('customerList').innerHTML=table(['Customer','Mobile','Due','Address'],db.customers.map(c=>row([esc(c.name),esc(c.phone||'—'),'<b class="'+(due(c)>0?'red':'green')+'">'+money(due(c))+'</b>',esc(c.address||'—')])));
+$('expenseHistory').innerHTML=table(['Date','Expense','Category','Amount','Note'],db.expenses.slice().reverse().map(e=>row([esc(e.date),esc(e.title),esc(e.category),money(e.amount),esc(e.note||'—')])));
+const totalPurchase=db.purchases.reduce((a,p)=>a+p.total,0);
+const totalExpense=db.expenses.reduce((a,e)=>a+e.amount,0);
+const installTotal=db.installations.reduce((a,i)=>a+i.amount,0);
+$('reportStats').innerHTML=[['Sales',money(salesTotal)],['Purchases',money(totalPurchase)],['Expenses',money(totalExpense)],['Customer due',money(dueTotal)]].map(x=>'<div class="card"><small>'+x[0]+'</small><strong>'+x[1]+'</strong></div>').join('');
+$('reportDetails').innerHTML=table(['Report','Amount'],[row(['Installation charges',money(installTotal)]),row(['Sales received',money(db.sales.reduce((a,s)=>a+s.paid,0))]),row(['Estimated gross margin',money(db.sales.reduce((a,s)=>a+s.total-(prod(s.productId)?.cost||0)*s.qty,0))]),row(['After recorded expenses (estimate)',money(db.sales.reduce((a,s)=>a+s.total-(prod(s.productId)?.cost||0)*s.qty,0)-totalExpense])]);
 }
-function esc(s){return String(s??"").replace(/[&<>"']/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch]));}
-function drawChart(){
-  const svg=document.getElementById("chart"),now=new Date(),days=[];
-  for(let i=6;i>=0;i--){const d=new Date(now);d.setDate(d.getDate()-i);days.push(d);}
-  const vals=days.map(d=>db.transactions.filter(t=>t.type==="Sale"&&new Date(t.date).toDateString()===d.toDateString()).reduce((s,t)=>s+t.amount,0));
-  const max=Math.max(1,...vals),pts=vals.map((v,i)=>`${35+i*88},${140-v/max*110}`).join(" ");
-  svg.innerHTML=`<line x1="25" y1="140" x2="590" y2="140" stroke="#34445b"/><line x1="25" y1="85" x2="590" y2="85" stroke="#29374c"/><line x1="25" y1="30" x2="590" y2="30" stroke="#29374c"/><polyline points="${pts}" fill="none" stroke="#3b82f6" stroke-width="3" stroke-linejoin="round"/>`+
-  vals.map((v,i)=>`<circle cx="${35+i*88}" cy="${140-v/max*110}" r="4" fill="#22c55e"><title>${money(v)}</title></circle><text x="${35+i*88}" y="162" text-anchor="middle" fill="#91a2bb" font-size="10">${days[i].getDate()}/${days[i].getMonth()+1}</text>`).join("");
-}
-function exportBackup(){
-  const blob=new Blob([JSON.stringify(db,null,2)],{type:"application/json"});
-  downloadBlob(blob,"SecureTrackSecurity_Backup_"+new Date().toISOString().slice(0,10)+".json");
-  document.getElementById("backupStatus").textContent="Backup download शुरू किया गया। Downloads folder जाँचें।";
-}
-function exportCSV(){
-  const rows=[["Brand","Model","Serial","Cost","Expected Price","Status","Sale Price","Customer"],...db.cameras.map(c=>[c.brand,c.model,c.serial,c.cost,c.price,c.status,c.salePrice,c.customer])];
-  const csv=rows.map(r=>r.map(v=>'"'+String(v??"").replace(/"/g,'""')+'"').join(",")).join("\r\n");
-  downloadBlob(new Blob(["\uFEFF"+csv],{type:"text/csv;charset=utf-8"}),"SecureTrackSecurity_Inventory.csv");
-}
-function downloadBlob(blob,name){
-  const url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
-}
-document.getElementById("restoreFile").addEventListener("change",async e=>{
-  const f=e.target.files[0];if(!f)return;
-  try{
-    const d=JSON.parse(await f.text());
-    if(!Array.isArray(d.cameras)||!Array.isArray(d.transactions))throw Error("Invalid backup");
-    if(!confirm("मौजूदा डेटा replace करके backup restore करें? पहले वर्तमान backup ले लें।"))return;
-    db=d;saveDB();alert("Backup restore हो गया।");
-  }catch(err){alert("Backup file सही नहीं है।");}
-  e.target.value="";
-});
-loadDB();render();
+document.querySelectorAll('[data-page]').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('[data-page]').forEach(x=>x.classList.remove('active'));document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));b.classList.add('active');$(b.dataset.page).classList.add('active')}));
+$('stockForm').addEventListener('submit',e=>{e.preventDefault();const f=e.target;db.products.push({id:uid(),name:val(f,'name'),category:val(f,'category'),model:val(f,'model'),qty:num(f,'qty'),min:num(f,'min'),cost:num(f,'cost'),price:num(f,'price'),supplier:val(f,'supplier'),serial:val(f,'serial').split(',').map(x=>x.trim()).filter(Boolean)});f.reset();save();alert('Stock सेव हो गया।')});
+$('purchaseForm').addEventListener('submit',e=>{e.preventDefault();const f=e.target,p=prod(val(f,'product')),qty=num(f,'qty'),cost=num(f,'cost');if(!p)return alert('Product चुनें।');p.qty+=qty;p.cost=cost;if(val(f,'supplier'))p.supplier=val(f,'supplier');db.purchases.push({id:uid(),date:today(),productId:p.id,qty,cost,total:qty*cost,supplier:val(f,'supplier'),note:val(f,'note')});f.reset();save();alert('Purchase सेव हो गई।')});
+$('saleForm').addEventListener('submit',e=>{e.preventDefault();const f=e.target,p=prod(val(f,'product')),qty=num(f,'qty'),price=num(f,'price'),paid=num(f,'paid');if(!p)return alert('Product चुनें।');if(qty>p.qty)return alert('इतना स्टॉक उपलब्ध नहीं है।');const total=qty*price;if(paid>total)return alert('Received amount total से ज्यादा है।');p.qty-=qty;db.sales.push({id:uid(),date:today(),productId:p.id,qty,price,total,paid,customerId:val(f,'customer'),note:val(f,'note')});f.reset();save();alert('Sale सेव हो गई।')});
+$('installForm').addEventListener('submit',e=>{e.preventDefault();const f=e.target;db.installations.push({id:uid(),date:today(),customer:val(f,'customer'),qty:num(f,'qty'),amount:num(f,'amount'),paid:num(f,'paid'),address:val(f,'address'),status:val(f,'status'),note:val(f,'note')});f.reset();save();alert('Installation सेव हो गई।')});
+$('customerForm').addEventListener('submit',e=>{e.preventDefault();const f=e.target;db.customers.push({id:uid(),name:val(f,'name'),phone:val(f,'phone'),openingDue:num(f,'due'),address:val(f,'address')});f.reset();save();alert('Customer सेव हो गया।')});
+$('paymentForm').addEventListener('submit',e=>{e.preventDefault();const f=e.target;db.payments.push({id:uid(),date:today(),customerId:val(f,'customer'),amount:num(f,'amount'),note:val(f,'note')});f.reset();save();alert('Payment सेव हो गई।')});
+$('expenseForm').addEventListener('submit',e=>{e.preventDefault();const f=e.target;db.expenses.push({id:uid(),date:today(),title:val(f,'title'),amount:num(f,'amount'),category:val(f,'category'),note:val(f,'note')});f.reset();save();alert('Expense सेव हो गया।')});
+$('searchStock').addEventListener('input',render);
+document.addEventListener('click',e=>{const id=e.target.dataset.delete;if(id&&confirm('यह product हटाएँ?')){db.products=db.products.filter(p=>p.id!==id);save()}});
+function download(name,content,type){const a=document.createElement('a'),url=URL.createObjectURL(new Blob([content],{type}));a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000)}
+$('backupBtn').onclick=()=>download('secure-track-backup.json',JSON.stringify(db,null,2),'application/json');
+$('csvBtn').onclick=()=>{const rows=[['Type','Date','Product / Description','Quantity','Amount','Paid','Note']];db.purchases.forEach(x=>rows.push(['Purchase',x.date,prod(x.productId)?.name||'',x.qty,x.total,'',x.note||x.supplier||'']));db.sales.forEach(x=>rows.push(['Sale',x.date,prod(x.productId)?.name||'',x.qty,x.total,x.paid,x.note||'']));db.expenses.forEach(x=>rows.push(['Expense',x.date,x.title,'',x.amount,'',x.note||'']));download('secure-track-transactions.csv',rows.map(r=>r.map(v=>'"'+String(v??'').replace(/"/g,'""')+'"').join(',')).join('\n'),'text/csv')};
+$('restoreFile').addEventListener('change',async e=>{const file=e.target.files[0];if(!file)return;try{const data=JSON.parse(await file.text());if(!Array.isArray(data.products)||!Array.isArray(data.customers))throw Error();if(confirm('वर्तमान डेटा replace होगा। जारी रखें?')){db={...emptyDB(),...data};save();$('backupMsg').textContent='Backup restore हो गया।'}}catch(err){alert('Backup file सही नहीं है।')}e.target.value=''});
+$('clearBtn').onclick=()=>{if(confirm('सारा डेटा delete होगा। क्या आपने backup लिया है?')&&confirm('पक्का delete करें?')){db=emptyDB();save();$('backupMsg').textContent='सारा डेटा हटाया गया।'}};
+render();
 </script>
 </body>
 </html>
