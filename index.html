@@ -288,8 +288,36 @@ const KEY='secure_track_business_manager_v2';
 const $=id=>document.getElementById(id);
 const emptyDB=()=>({products:[],customers:[],purchases:[],sales:[],installations:[],expenses:[],payments:[],scanLogs:[],quotations:[],settings:{bankName:'',accountHolder:'',accountNumber:'',ifsc:'',upiId:'',qrData:''}});
 let db;
-try{db={...emptyDB(),...JSON.parse(localStorage.getItem(KEY)||'{}')}}catch(e){db=emptyDB()}
-for(const k of ['products','customers','purchases','sales','installations','expenses','payments','scanLogs','quotations'])if(!Array.isArray(db[k]))db[k]=[]; if(!db.settings||typeof db.settings!=='object')db.settings={bankName:'',accountHolder:'',accountNumber:'',ifsc:'',upiId:'',qrData:''};
+try {
+  db = { ...emptyDB(), ...JSON.parse(localStorage.getItem(KEY) || '{}') };
+} catch (e) {
+  db = emptyDB();
+}
+
+for (const k of ['products','customers','purchases','sales','installations','expenses','payments','scanLogs','quotations']) {
+  if (!Array.isArray(db[k])) db[k] = [];
+}
+
+if (!db.settings || typeof db.settings !== 'object') {
+  db.settings = {bankName:'',accountHolder:'',accountNumber:'',ifsc:'',upiId:'',qrData:''};
+}
+
+// Demo products: add only if the product list is empty
+if (db.products.length === 0) {
+  db.products = [
+    {id:'demo_cp_dome', name:'CP Plus 2MP Dome Camera', model:'2MP Dome', category:'Dome Camera', qty:5, cost:650, price:850},
+    {id:'demo_cp_bullet', name:'CP Plus 2MP Bullet Camera', model:'2MP Bullet', category:'Bullet Camera', qty:5, cost:700, price:950},
+    {id:'demo_cp_4ch', name:'CP Plus 4 Channel DVR', model:'4 Channel DVR', category:'DVR', qty:5, cost:1800, price:2300},
+    {id:'demo_cp_8ch', name:'CP Plus 8 Channel DVR', model:'8 Channel DVR', category:'DVR', qty:5, cost:2800, price:3500},
+    {id:'demo_hdd_1tb', name:'1TB Surveillance Hard Disk', model:'1TB HDD', category:'Hard Disk', qty:5, cost:2800, price:3400}
+  ];
+  try {
+    localStorage.setItem(KEY, JSON.stringify(db));
+  } catch (e) {
+    alert('Demo products could not be saved. Please create a backup and check phone storage.');
+  }
+}
+
 const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,7);
 const val=id=>$(id).value.trim();
 const num=id=>Math.max(0,Number($(id).value)||0);
@@ -301,12 +329,23 @@ const cust=id=>db.customers.find(x=>x.id===id);
 const cname=id=>cust(id)?.name||'—';
 const total=a=>a.reduce((s,x)=>s+(Number(x.total)||0),0);
 const saleDue=s=>(Number(s.total)||0)-(Number(s.paid)||0);
+
 function due(c){
- const sales=db.sales.filter(s=>s.customerId===c.id).reduce((a,s)=>a+saleDue(s),0);
- const installs=db.installations.filter(i=>i.customerId===c.id).reduce((a,i)=>a+(Number(i.amount)||0)-(Number(i.paid)||0),0);
- const payments=db.payments.filter(p=>p.customerId===c.id).reduce((a,p)=>a+(Number(p.amount)||0),0);
- return Math.max(0,(Number(c.openingDue)||0)+sales+installs-payments);
+  const sales=db.sales.filter(s=>s.customerId===c.id).reduce((a,s)=>a+saleDue(s),0);
+  const installs=db.installations.filter(i=>i.customerId===c.id).reduce((a,i)=>a+(Number(i.amount)||0)-(Number(i.paid)||0),0);
+  const payments=db.payments.filter(p=>p.customerId===c.id).reduce((a,p)=>a+(Number(p.amount)||0),0);
+  return Math.max(0,(Number(c.openingDue)||0)+sales+installs-payments);
 }
+
+function save(){
+  try {
+    localStorage.setItem(KEY,JSON.stringify(db));
+    render();
+  } catch(e) {
+    alert('Could not save data. Free up phone storage and create a backup.');
+  }
+}
+  
 function save(){
  try{localStorage.setItem(KEY,JSON.stringify(db));render()}
  catch(e){alert('Could not save data. Free up phone storage and create a backup.')}
