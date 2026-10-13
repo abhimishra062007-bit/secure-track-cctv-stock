@@ -138,7 +138,13 @@ th{color:var(--muted);background:#f8faff}
       <div class="field"><label>Product / Model *</label><select id="scanProduct"></select></div>
       <div class="field"><label>Scan or Enter Serial Number</label><input id="scanSerial" autocomplete="off" placeholder="Scan barcode or type serial number"></div>
     </div>
-    <div class="actions"><button class="btn" id="addSerial" type="button">Add Serial</button><button class="btn secondary" id="clearScans" type="button">Clear Pending Scans</button></div>
+     
+    <div class="actions">
+  <button class="btn" id="startScan" type="button">Start Scanning</button>
+  <button class="btn" id="addSerial" type="button">Add Serial</button>
+  <button class="btn secondary" id="clearScans" type="button">Clear Pending Scans</button>
+</div>
+    
     <p><b>Unique serials scanned: <span id="scanCount">0</span></b></p>
     <div class="tablewrap"><table><thead><tr><th>Serial Number</th><th>Scan Date & Time</th><th>Action</th></tr></thead><tbody id="scanList"><tr><td class="empty" colspan="3">No serials scanned yet.</td></tr></tbody></table></div>
     <div class="actions"><button class="btn green" id="confirmScans" type="button">Confirm Stock</button></div>
