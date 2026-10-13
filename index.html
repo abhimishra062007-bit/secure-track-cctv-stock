@@ -523,23 +523,66 @@ $('restoreNow').onclick=()=>{
  reader.readAsText(file);
 };
 
-let pendingSerials=[];
-const scanProduct=()=>prod(val('scanProduct'));
-function renderScans(){
- $('scanCount').textContent=pendingSerials.length;
- $('scanList').innerHTML=pendingSerials.length?pendingSerials.map((x,i)=>'<tr><td>'+esc(x.serialNumber)+'</td><td>'+esc(x.scannedAt)+'</td><td><button class="btn danger" type="button" data-remove-scan="'+i+'">Remove</button></td></tr>').join(''):'<tr><td class="empty" colspan="3">No serials scanned yet.</td></tr>';
+
+let pendingSerials = [];
+const scanProduct = () => prod(val('scanProduct'));
+
+function renderScans() {
+  $('scanCount').textContent = pendingSerials.length;
+  $('scanList').innerHTML = pendingSerials.length
+    ? pendingSerials.map((x, i) =>
+        '<tr><td>' + esc(x.serialNumber) +
+        '</td><td>' + esc(x.scannedAt) +
+        '</td><td><button class="btn danger" type="button" data-remove-scan="' +
+        i + '">Remove</button></td></tr>'
+      ).join('')
+    : '<tr><td class="empty" colspan="3">No serials scanned yet.</td></tr>';
 }
-function addSerial(){
- const p=scanProduct(),serial=val('scanSerial');
- if(!p)return alert('Select a product/model first.');
- if(!serial)return alert('Scan or enter a serial number.');
- const normalized=serial.toLowerCase();
- if((p.serials||[]).some(x=>String(x.serialNumber||x).toLowerCase()===normalized)||pendingSerials.some(x=>x.productId===p.id&&x.serialNumber.toLowerCase()===normalized)){alert('Duplicate serial number. It was not counted.');$('scanSerial').select();return}
- pendingSerials.push({productId:p.id,serialNumber:serial,scannedAt:new Date().toLocaleString('en-IN')});
- $('scanSerial').value='';renderScans();$('scanSerial').focus();
+
+function addSerial() {
+  clearTimeout(scanDebounce);
+
+  const p = scanProduct();
+  const serial = val('scanSerial').trim();
+
+  if (!p) {
+    $('scanStatus').textContent = 'Select a product/model first.';
+    return;
+  }
+  if (!serial) return;
+
+  const normalized = serial.toLowerCase();
+
+  if (
+    (p.serials || []).some(x =>
+      String(x.serialNumber || x).trim().toLowerCase() === normalized
+    ) ||
+    pendingSerials.some(x =>
+      x.productId === p.id &&
+      x.serialNumber.trim().toLowerCase() === normalized
+    )
+  ) {
+    $('scanStatus').textContent = 'Duplicate serial rejected: ' + serial;
+    $('scanSerial').value = '';
+    if (scanningActive) $('scanSerial').focus();
+    return;
+  }
+
+  pendingSerials.push({
+    productId: p.id,
+    serialNumber: serial,
+    scannedAt: new Date().toLocaleString('en-IN')
+  });
+
+  $('scanSerial').value = '';
+  renderScans();
+  $('scanStatus').textContent = 'Added ' + serial;
+
+  if (scanningActive) $('scanSerial').focus();
 }
-$('addSerial').onclick=addSerial;
-  
+
+$('addSerial').onclick = addSerial;
+
 let scanningActive = false;
 let scanDebounce = null;
 
@@ -549,14 +592,18 @@ $('startScan').onclick = () => {
     ? 'Stop Scanning'
     : 'Start Scanning';
 
+  $('scanStatus').textContent = scanningActive
+    ? 'Scanning active. Scan serials continuously.'
+    : 'Scanning stopped.';
+
   if (scanningActive) $('scanSerial').focus();
   else clearTimeout(scanDebounce);
 };
 
 $('scanSerial').addEventListener('keydown', e => {
-  if (e.key === 'Enter') {
+  if (e.key === 'Enter' && scanningActive) {
     e.preventDefault();
-    if (scanningActive) addSerial();
+    addSerial();
   }
 });
 
@@ -565,11 +612,12 @@ $('scanSerial').addEventListener('input', () => {
 
   clearTimeout(scanDebounce);
   scanDebounce = setTimeout(() => {
-    if (scanningActive && $('scanSerial').value.trim()) {
+    if (scanningActive && val('scanSerial').trim()) {
       addSerial();
     }
   }, 450);
 });
+  
   
 $('scanSerial').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();addSerial()}});
 $('scanList').addEventListener('click',e=>{const b=e.target.closest('[data-remove-scan]');if(b){pendingSerials.splice(Number(b.dataset.removeScan),1);renderScans()}});
