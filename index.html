@@ -151,6 +151,27 @@ th{color:var(--muted);background:#f8faff}
   </div>
   <div class="card"><div class="section-title">Current Stock</div><input id="stockSearch" placeholder="Search products..." style="margin-bottom:12px"><div class="tablewrap"><table><thead><tr><th>Product</th><th>Quantity</th><th>Cost</th><th>Selling Price</th><th>Actions</th></tr></thead><tbody id="stockList"></tbody></table></div></div>
 </section>
+  <section class="page" id="modelSerialPage">
+  <div class="actions" style="margin-top:0;margin-bottom:12px">
+    <button class="btn secondary" id="backToStock" type="button">← Back to Stock</button>
+  </div>
+  <h2 id="serialModelTitle">Model Serial Numbers</h2>
+  <p class="sub">Serial numbers saved for this model.</p>
+  <div class="card">
+    <input id="modelSerialSearch" placeholder="Search serial number..." autocomplete="off" style="margin-bottom:12px">
+    <div class="tablewrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Serial Number</th>
+            <th>Scan Date &amp; Time</th>
+          </tr>
+        </thead>
+        <tbody id="modelSerialList"></tbody>
+      </table>
+    </div>
+  </div>
+  </section>
 
 <section class="page" id="purchase">
   <h2>Purchases</h2><p class="sub">Record supplier purchases and increase stock.</p>
@@ -409,7 +430,7 @@ function render(){
   setOptions('scanProduct',db.products,'Select product/model'); setOptions('qProduct',db.products,'Select product/model');
  const q=($('stockSearch')?.value||'').toLowerCase();
  tableRows('stockList',db.products.filter(p=>(p.name+' '+(p.sku||'')+' '+(p.category||'')).toLowerCase().includes(q)),[
- p=>'<b>'+esc(p.name)+'</b><br><span class="muted">'+esc(p.sku||p.category||'')+'</span>',
+ p=>'<button type="button" data-open-model="'+esc(p.id)+'" style="border:0;background:transparent;color:var(--blue);padding:0;text-align:left;font-weight:800;text-decoration:underline">'+esc(p.name)+'</button><br><span class="muted">'+esc(p.sku||p.category||'')+'</span>',
  p=>esc(p.qty),p=>money(p.cost),p=>money(p.price),
  p=>'<button class="btn secondary" data-edit-product="'+p.id+'">Edit</button> <button class="btn danger" data-del-product="'+p.id+'">Delete</button>'
  ]);
@@ -470,7 +491,56 @@ $('stockList').addEventListener('click',e=>{
  if(del&&confirm('Delete this product? Its name may no longer appear in older transactions.')){db.products=db.products.filter(p=>p.id!==del);save()}
 });
 $('stockSearch').addEventListener('input',render);
+let activeSerialModelId = '';
 
+function renderModelSerials(){
+  const p = prod(activeSerialModelId);
+
+  if(!p){
+    $('serialModelTitle').textContent = 'Model Serial Numbers';
+    $('modelSerialList').innerHTML =
+      '<tr><td class="empty" colspan="2">Model not found.</td></tr>';
+    return;
+  }
+
+  $('serialModelTitle').textContent =
+    (p.name || 'Model') + ' — Serial Numbers';
+
+  const q = ($('modelSerialSearch').value || '').trim().toLowerCase();
+
+  const serials = (Array.isArray(p.serials) ? p.serials : [])
+    .map(x => typeof x === 'string'
+      ? { serialNumber: x, scannedAt: '' }
+      : x)
+    .filter(x =>
+      String(x.serialNumber || '').toLowerCase().includes(q)
+    );
+
+  $('modelSerialList').innerHTML = serials.length
+    ? serials.map(x =>
+        '<tr><td><b>' + esc(x.serialNumber || '') +
+        '</b></td><td>' + esc(x.scannedAt || '—') +
+        '</td></tr>'
+      ).join('')
+    : '<tr><td class="empty" colspan="2">' +
+      (q ? 'No matching serial numbers.' :
+      'No serial numbers saved for this model yet.') +
+      '</td></tr>';
+}
+
+$('stockList').addEventListener('click', e => {
+  const b = e.target.closest('[data-open-model]');
+  if(!b) return;
+
+  activeSerialModelId = b.dataset.openModel;
+  $('modelSerialSearch').value = '';
+  renderModelSerials();
+  go('modelSerialPage');
+});
+
+$('modelSerialSearch').addEventListener('input', renderModelSerials);
+
+$('backToStock').onclick = () => go('stock');
 $('customerForm').addEventListener('submit',e=>{
  e.preventDefault();
  const id=val('cId');
